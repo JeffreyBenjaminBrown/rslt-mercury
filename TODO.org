@@ -1,0 +1,27 @@
+Index = Arity = Position = Int
+Expr :: Word String | Rel | Template [String]
+Role :: RoleTemplate | RoleMbr Position
+indexMap :: Expr is word or template -> Index
+relIndexMap :: (Index of template, [Index]) -> Index of rel
+arityMap :: Index of template or rel -> Arity
+  % could omit, infer by counting
+containerMap :: Index -> (Index of rel, Role)
+memberMap :: (Index of rel, Role) -> Index
+
+-- 
+
+A map of "nodes" maps Index (Int) to Exprs. Expr, as in the Haskell implementation, has constructors Word, Rel and Template.
+
+Starting from the strings defining a Word or a Template, you can look up its Index in another hashmap, the "index map" :: Expr -> Index. Maybe you can also look up a Rel that way, starting from the Tplt and member Indexes that define it.
+
+Startinng from any Expr, you can look up what it is a member of in the "membership map", a Map from Index to Set (Role,Index).
+
+<< Rule: if (k,s) is in the membership map and (r,i) is in s, i should be the index of a Rel. Moreover if r=template, then k must be a Template.>>
+
+Starting from the index of a Rel or a Template, you can look up its Arity (Int) in the "arity map": Index -> Arity.
+
+<< Rule: If Template t has Arity 'a', and Rel r uses t, then r must have 'a' members. >>
+
+Starting from the index of a Rel, you can look up its Template in the "template map" (:: Index -> Index), and its members in the "member map" (:: (Index, Position) -> Index).
+
+<< Rule: If Rel r has Index i and Arity a, and p is in [1,a], then (i, p) is a key of the member map. If p is not in [1,a] then (i,p) is not a key of the member map. >>
