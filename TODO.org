@@ -1,11 +1,11 @@
 * types
 Index = Arity = Int
-Position = (Index of rel, Role) -- ^ "of rel", etc. : not enforced by types
-  -- (This is like a position at an employer: it includes host and role.)
-Role :: RoleTemplate | RoleMember Int
 Expr :: Word String
   | Rel -- ^ connects to a template and to arity exprs(likely not templates).
   | Template -- ^ connects to arity exprs(likely all words).
+Role :: RoleTemplate | RoleMember Int
+Position = (Index of rel, Role) -- ^ "of rel", etc. : not enforced by types
+  -- (This is like a position at an employer: it includes host and role.)
 ExprImg :: Index
   | ImgWord String
   | ImgRel ImgExpr [ImgExpr] -- ^ first arg should be of a template
