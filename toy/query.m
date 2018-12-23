@@ -1,10 +1,7 @@
-:- module toy.
+:- module query.
 :- interface.
-:- import_module io.
 :- import_module int.
 :- import_module list.
-
-:- pred main(io::di, io::uo) is det.
 
 :- type pQuery ---> qElt( int )
       ; qFind( func( list(int) ) = list(int) ).
@@ -20,6 +17,3 @@ runPQuery( List, qElt( Elt ), Elt ) :-
 runPQuery( List, qFind( Gen ), Elt ) :-
   Gen( List ) = Elts,
   list.member( Elt, Elts ).
-
-main(!IO) :-
-  io.write_string( "testing\n"   , !IO).

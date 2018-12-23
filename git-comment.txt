@@ -1,5 +1,0 @@
-start: positive queries
-  :- type pQuery ---> qElt( int )
-        ; qFind( func( list(int) ) = list(int) ).
-  :- pred runPQuery( list(int), pQuery, int ).
-  :- mode runPQuery( in, in, out ) is nondet.
