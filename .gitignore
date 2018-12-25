@@ -1,0 +1,11 @@
+git-comment.txt
+
+.#*
+*.err
+*.mh
+*~
+
+Mercury/
+
+rslt
+test
