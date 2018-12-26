@@ -8,7 +8,7 @@
       ; qFind( func( list(int) ) = list(int) ).
 
 :- type nQuery ---> qNot( int )
-      ; qCond( func( list(int), int ) = bool ).
+      ; qCond( func( int ) = bool).
 
 :- pred runPQuery( list(int), pQuery, int ).
 :- mode runPQuery( in,        in,     out ) is nondet.
@@ -20,7 +20,8 @@
 :- implementation.
 
 checkNQuery( Space, qCond(Q) , Elt, Res ) :-
-  Q( Space, Elt ) = Res.
+  list.member( Elt, Space )
+  , Q( Elt ) = Res.
 checkNQuery( Space, qNot(Int), Elt, yes ) :-
   list.member( Elt, Space )
   , Elt \= Int.
