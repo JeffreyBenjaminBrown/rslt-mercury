@@ -1,3 +1,4 @@
+* TODO : use sets, see if I can make those checkNQuery etc. deterministic.
 * types
 Index = Arity = Int
 Expr :: Word String

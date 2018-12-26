@@ -10,8 +10,8 @@
 :- type nQuery ---> qNot( int )
       ; qCond( func( int ) = bool).
 
-:- pred runPQuery( list(int), pQuery, int ).
-:- mode runPQuery( in,        in,     out ) is nondet.
+:- pred runPQuery( list(int), pQuery, list(int) ).
+:- mode runPQuery( in,        in,     out       ) is det.
 
 :- pred checkNQuery( list(int), nQuery, int, bool ).
 :- mode checkNQuery( in,        in,     in,  out ) is nondet.
@@ -29,8 +29,7 @@ checkNQuery( Space, qNot(Int), Elt, no  ) :-
   not( list.member( Elt, Space ) )
   ; Elt = Int.
 
-runPQuery( List, qElt( Elt ), Elt ) :-
-  list.member( Elt, List ).
-runPQuery( List, qFind( Gen ), Elt ) :-
-  Gen( List ) = Elts,
-  list.member( Elt, Elts ).
+runPQuery( List, qElt( Elt ), Res    ) :-
+  Res = ( if list.member( Elt, List )
+          then [Elt] else [] ).
+runPQuery( List, qFind( Gen ), Gen( List ) ).
