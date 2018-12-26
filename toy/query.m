@@ -13,18 +13,18 @@
 :- pred runPQuery( list(int), pQuery, int ).
 :- mode runPQuery( in,        in,     out ) is nondet.
 
-:- pred testNQuery( list(int), nQuery, int, bool ).
-:- mode testNQuery( in,        in,     in,  out ) is nondet.
+:- pred checkNQuery( list(int), nQuery, int, bool ).
+:- mode checkNQuery( in,        in,     in,  out ) is nondet.
 
 
 :- implementation.
 
-testNQuery( Space, qCond(Q) , Elt, Res ) :-
+checkNQuery( Space, qCond(Q) , Elt, Res ) :-
   Q( Space, Elt ) = Res.
-testNQuery( Space, qNot(Int), Elt, yes ) :-
+checkNQuery( Space, qNot(Int), Elt, yes ) :-
   list.member( Elt, Space )
   , Elt \= Int.
-testNQuery( Space, qNot(Int), Elt, no  ) :-
+checkNQuery( Space, qNot(Int), Elt, no  ) :-
   not( list.member( Elt, Space ) )
   ; Elt = Int.
 
