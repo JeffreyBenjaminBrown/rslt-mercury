@@ -23,16 +23,20 @@ testQElt = Res :-
   solutions( runPQuery( aSpace, qElt( 3 ) )
            , Solved )
   , Expected = set.from_list( [3] )
-  , Res = ( if set.from_list( Solved ) = Expected
-             then yes else no ).
+  , Res = ( if set.from_list(Solved) = Expected
+            then yes else no ).
 
 :- func aFilter( list(int) ) = list(int).
 aFilter(List) = list.filter( <(3), List ).
 
-main(!IO) :-
-  io.write_string( "testQElt: " ++ string(testQElt) , !IO),
+:- func testQFind = bool.
+testQFind = Res :-
+  solutions( runPQuery( aSpace, qFind( aFilter ) )
+           , Solved )
+  , Expected = set.from_list( [4,5] )
+  , Res = ( if set.from_list(Solved) = Expected
+            then yes else no ).
 
-  solutions( runPQuery( aSpace, qFind( aFilter ) ), S2 ),
-  io.write_string( "\nS2: "   , !IO),
-  io.print( S2, !IO ),
-  io.write_string( "\n", !IO ).
+main(!IO) :-
+   io.write_string( "testQElt: "  ++ string(testQElt)  ++ "\n", !IO),
+   io.write_string( "testQFind: " ++ string(testQFind) ++ "\n", !IO).
