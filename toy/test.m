@@ -16,12 +16,36 @@
 :- import_module string.
 
 :- func fiveNumberSpace = list(int).
+:- pred eq( X, X, bool ).
+:- mode eq( in, in, out ) is det.
+:- func eq( X, X) = bool.
+
+:- func testFindable = bool.
 :- func testQElt = bool.
 :- func testQFind = bool.
 :- func testQCond = bool.
 :- func testQAnd = list(int).
 
 fiveNumberSpace = [1,2,3,4,5].
+
+eq( X, Y, Bool ) :-
+  Bool = (if X=Y then yes else no).
+eq( X, Y ) = Bool :-
+  eq( X, Y, Bool ).
+
+testFindable = Res :-
+  QF = qqFind( qFind( list.filter( <(2) ) ) )
+  , QC = qqCond( qCond( func( Int ) = (if Int > 4 then no else yes) ) )
+  , findable( QF, T1 )
+  , findable( QC, T2 )
+  , findable( qqAnd( [QF] ), T3 )
+  , findable( qqAnd( [QC] ), T4 )
+  , findable( qqAnd( [QC, QF] ), T5 )
+  , Res = bool.and_list( [ eq( T1, yes )
+                         , eq( T2, no )
+                         , eq( T3, yes )
+                         , eq( T4, no )
+                         , eq( T5, yes ) ] ).
 
 testQElt = Res :-
   runQFind( fiveNumberSpace
@@ -57,7 +81,8 @@ testQAnd = Res :-
 %            then yes else no ).
 
 main(!IO) :-
-   io.write_string( "testQElt: "  ++ string(testQElt)  ++ "\n", !IO),
-   io.write_string( "testQFind: " ++ string(testQFind) ++ "\n", !IO),
-   io.write_string( "testQCond: " ++ string(testQCond) ++ "\n", !IO),
-   io.write_string( "testQAnd: "  ++ string(testQAnd)  ++ "\n", !IO).
+   io.write_string( "testFindable: " ++ string(testFindable) ++ "\n", !IO),
+   io.write_string( "testQElt: "     ++ string(testQElt)     ++ "\n", !IO),
+   io.write_string( "testQFind: "    ++ string(testQFind)    ++ "\n", !IO),
+   io.write_string( "testQCond: "    ++ string(testQCond)    ++ "\n", !IO),
+   io.write_string( "testQAnd: "     ++ string(testQAnd)     ++ "\n", !IO).
