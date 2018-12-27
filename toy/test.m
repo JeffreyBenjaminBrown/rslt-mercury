@@ -16,9 +16,12 @@
 :- import_module string.
 
 :- func fiveNumberSpace = list(int).
+:- func testQElt = bool.
+:- func testQFind = bool.
+:- func testQCond = bool.
+
 fiveNumberSpace = [1,2,3,4,5].
 
-:- func testQElt = bool.
 testQElt = Res :-
   runQFind( fiveNumberSpace
           , qElt( 3 )
@@ -27,7 +30,6 @@ testQElt = Res :-
   , Res = ( if set.from_list(Solved) = Expected
             then yes else no ).
 
-:- func testQFind = bool.
 testQFind = Res :-
   runQFind( fiveNumberSpace
           , qFind( list.filter( <(3) ) )
@@ -36,7 +38,6 @@ testQFind = Res :-
   , Res = ( if set.from_list(Solved) = Expected
             then yes else no ).
 
-:- func testQCond = bool.
 testQCond = Res :-
   QC = qCond( func( Int ) = (if Int > 3 then yes else no) )
   , checkQCond( QC, 5, Res5 )
