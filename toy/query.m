@@ -20,6 +20,8 @@
 
 :- pred runQFind( list(int), qFind, list(int) ).
 :- mode runQFind( in,        in,    out       ) is det.
+:- pred inQFind(  list(int), qFind, int ).
+:- mode inQFind(  in,        in,    in  ) is semidet.
 
 :- pred checkQCond( qCond,  int, bool ).
 :- mode checkQCond( in,     in,  out  ) is det.
@@ -51,20 +53,24 @@ passesAllChecks( Qs, Elt ) :-
 
 runQuery( Space, qFind( QF ), Res ) :-
   runQFind( Space, QF, Res ).
-runQuery( Space, qAnd( Qs ), Res ) :-
-  list.filter( findable, Qs, QFs, QNs )
-  , list.map( runQuery( Space ), QFs, FoundLists )
+runQuery( Space, qAnd( Qs ), Checkeds ) :-
+  list.filter( findable, Qs, QQFs, QQCs )
+  , list.map( runQuery( Space ), QQFs, FoundLists )
   , list.condense( FoundLists, Founds )
-%  , list.filter( passesAllChecks( QNs ) % TODO next
-%               , Founds
-%               , Checkeds )
-%  , set.list_to_set( Checkeds, CheckedSets )
-  , Res = [].
+  , list.map( ( pred( qCond( QC ) :: in, QC :: out ) is semidet )
+            , QQCs, QCs )
+  , list.filter( passesAllChecks( QCs )
+               , Founds
+               , Checkeds ).
 
 runQFind( Space, qElt( Elt ),  Res          ) :-
   Res = ( if list.member( Elt, Space )
           then [Elt] else [] ).
 runQFind( Space, qFind( Gen ), Gen( Space ) ).
+
+inQFind( Space, Q,  Elt ) :-
+  runQFind( Space, Q, Elts )
+  , list.member( Elt, Elts ).
 
 checkQCond(    qCond(Q), Elt, Q(Elt) ).
 checkQCond(    qCond(Q), Elt ) :-
