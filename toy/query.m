@@ -35,6 +35,12 @@ findable( qAnd( Qs ), Res ) :-
   list.map( findable, Qs, Findables )
   , Res = bool.and_list( Findables ).
 
+:- pred findable( query ).
+:- mode findable( in ) is semidet.
+findable( In ) :-
+  findable( In, yes ).
+% Use that for this: list.filter( findable, Qs, QFs, QNs ).
+
 runQuery( Space, qFind( QF ), Res ) :-
   runQFind( Space, QF, Res ).
 
