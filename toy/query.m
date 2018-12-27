@@ -17,11 +17,15 @@
 
 :- pred runQuery( list(int), query, list(int) ).
 :- mode runQuery( in,        in,    out       ) is semidet.
+:- pred inQuery(  list(int), query, int ).
+:- mode inQuery(  in,        in,    out       ) is nondet.
+:- mode inQuery(  in,        in,    in        ) is semidet.
 
 :- pred runQFind( list(int), qFind, list(int) ).
 :- mode runQFind( in,        in,    out       ) is det.
-:- pred inQFind(  list(int), qFind, int ).
-:- mode inQFind(  in,        in,    in  ) is semidet.
+:- pred inQFind(  list(int), qFind, int  ).
+:- mode inQFind(  in,        in,    in   ) is semidet.
+:- mode inQFind(  in,        in,    out  ) is nondet.
 
 :- pred checkQCond( qCond,  int, bool ).
 :- mode checkQCond( in,     in,  out  ) is det.
@@ -62,6 +66,9 @@ runQuery( Space, qAnd( Qs ), Checkeds ) :-
   , list.filter( passesAllChecks( QCs )
                , Founds
                , Checkeds ).
+
+inQuery( Space, qFind( QF ), Elt ) :-
+  inQFind( Space, QF, Elt ).
 
 runQFind( Space, qElt( Elt ),  Res          ) :-
   Res = ( if list.member( Elt, Space )

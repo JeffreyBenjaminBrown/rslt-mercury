@@ -1,3 +1,5 @@
+* test qAnd
+* test new alternate modes
 * use sets
 * QNot 
 ** 1st iteration
