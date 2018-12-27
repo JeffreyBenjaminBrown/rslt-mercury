@@ -1,4 +1,19 @@
-* TODO : use sets, see if I can make those checkNQuery etc. deterministic.
+* use sets
+* QNot 
+** 1st iteration
+:- type qCond ---> qNot( int ) ; ...
+checkQCond( qNot(Int), Elt, Res ) :-
+  Res = (if ( Elt \= Int )
+        then yes else no).
+:- func testQNot = bool.
+testQNot = Res :-
+    checkQCond( qNot(1), 1, Res1 )
+  , checkQCond( qNot(1), 0, Res0 )
+  , Res = (if [Res1, Res0] = [no,yes] then yes else no).
+test.main ...
+  io.write_string( "testQNot: "  \++ string(testQNot)  ++ "\n", !IO).
+  % that \++ is just ++ to avoid strikethrough
+** 2nd : QNot should hold an entire Query
 * types
 Index = Arity = Int
 Expr :: Word String

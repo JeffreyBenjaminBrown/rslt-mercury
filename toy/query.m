@@ -4,27 +4,29 @@
 :- import_module int.
 :- import_module list.
 
-:- type pQuery ---> qElt( int )
-      ; qFind( func( list(int) ) = list(int) ).
+:- type qFind ---> qElt( int )
+                 ; qFind( func( list(int) ) = list(int) ).
 
-:- type nQuery ---> qNot( int )
-      ; qCond( func( int ) = bool).
+:- type qCond ---> qCond( func( int ) = bool).
 
-:- pred runPQuery( list(int), pQuery, list(int) ).
-:- mode runPQuery( in,        in,     out       ) is det.
+:- type query ---> qFind( qFind ).
+%                ; qCond( qCond ).
+%                ; qAnd( list(query) )
+%                ; qOr( list(query) )
+%                ; qVar( string ).
 
-:- pred checkNQuery( nQuery, int, bool ).
-:- mode checkNQuery( in,     in,  out ) is det.
+:- pred runQFind( list(int), qFind, list(int) ).
+:- mode runQFind( in,        in,    out       ) is det.
+
+:- pred checkQCond( qCond, int, bool ).
+:- mode checkQCond( in,     in,  out ) is det.
 
 
 :- implementation.
 
-checkNQuery( qCond(Q) , Elt, Q(Elt) ).
-checkNQuery( qNot(Int), Elt, Res ) :-
-  Res = (if ( Elt \= Int )
-        then yes else no).
+checkQCond( qCond(Q) , Elt, Q(Elt) ).
 
-runPQuery( List, qElt( Elt ), Res    ) :-
+runQFind( List, qElt( Elt ), Res    ) :-
   Res = ( if list.member( Elt, List )
           then [Elt] else [] ).
-runPQuery( List, qFind( Gen ), Gen( List ) ).
+runQFind( List, qFind( Gen ), Gen( List ) ).
