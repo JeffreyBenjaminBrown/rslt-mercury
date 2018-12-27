@@ -9,7 +9,7 @@
 
 :- type qCond ---> qCond( func( int ) = bool).
 
-:- type query ---> qFind( qFind ) % TODO next
+:- type query ---> qFind( qFind )
                  ; qCond( qCond )
                  ; qAnd( list(query) ).
 %                ; qOr( list(query) )
@@ -21,10 +21,10 @@
 :- pred runQFind( list(int), qFind, list(int) ).
 :- mode runQFind( in,        in,    out       ) is det.
 
-:- pred checkQCond( qCond, int, bool ).
-:- mode checkQCond( in,     in,  out ) is det.
-:- pred checkQCond( qCond, int ).
-:- mode checkQCond( in,     in       ) is semidet.
+:- pred checkQCond( qCond,  int, bool ).
+:- mode checkQCond( in,     in,  out  ) is det.
+:- pred checkQCond( qCond,  int ).
+:- mode checkQCond( in,     in        ) is semidet.
 
 
 :- implementation.
@@ -43,8 +43,11 @@ findable( qAnd( Qs ), Res ) :-
 findable( In ) :-
   findable( In, yes ).
 
-% passesAllChecks( Qs, Elt ) :-
-  
+:- pred passesAllChecks( list(qCond), int ).
+:- mode passesAllChecks( in,          in  ) is semidet.
+passesAllChecks( Qs, Elt ) :-
+  list.all_true( (pred( Q :: in ) is semidet :- checkQCond( Q, Elt ) )
+               , Qs ).
 
 runQuery( Space, qFind( QF ), Res ) :-
   runQFind( Space, QF, Res ).
@@ -52,9 +55,9 @@ runQuery( Space, qAnd( Qs ), Res ) :-
   list.filter( findable, Qs, QFs, QNs )
   , list.map( runQuery( Space ), QFs, FoundLists )
   , list.condense( FoundLists, Founds )
-%  , list.map( _(some kind of lambda for "passes all the QNs")
-%            , Founds
-%            , Checkeds )
+%  , list.filter( passesAllChecks( QNs ) % TODO next
+%               , Founds
+%               , Checkeds )
 %  , set.list_to_set( Checkeds, CheckedSets )
   , Res = [].
 

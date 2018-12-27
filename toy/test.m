@@ -36,13 +36,9 @@ testQFind = Res :-
   , Res = ( if set.from_list(Solved) = Expected
             then yes else no ).
 
-% todo : make into a lambda, or disappear via currying
-:- func gt3( int ) = bool.
-gt3( Elt ) = (if Elt > 3 then yes else no).
-
 :- func testQCond = bool.
 testQCond = Res :-
-  QC = qCond( gt3 )
+  QC = qCond( func( Int ) = (if Int > 3 then yes else no) )
   , checkQCond( QC, 5, Res5 )
   , checkQCond( QC, 3, Res3 )
   , checkQCond( QC, 3, Res0 )
