@@ -1,5 +1,6 @@
-* test qAnd
+* test findable, passesAllChecks
 * test new alternate modes
+* test qAnd (paused)
 * use sets
 * QNot 
 ** 1st iteration

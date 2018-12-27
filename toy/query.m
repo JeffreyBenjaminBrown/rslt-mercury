@@ -9,11 +9,19 @@
 
 :- type qCond ---> qCond( func( int ) = bool).
 
-:- type query ---> qFind( qFind )
-                 ; qCond( qCond )
-                 ; qAnd( list(query) ).
-%                ; qOr( list(query) )
-%                ; qVar( string ).
+:- type query ---> qqFind( qFind )
+                 ; qqCond( qCond )
+                 ; qqAnd( list(query) ).
+%                ; qqOr( list(query) )
+%                ; qqVar( string ).
+
+:- pred findable( query, bool ).
+:- mode findable( in, out ) is det.
+:- pred findable( query ).
+:- mode findable( in ) is semidet.
+
+:- pred passesAllChecks( list(qCond), int ).
+:- mode passesAllChecks( in,          in  ) is semidet.
 
 :- pred runQuery( list(int), query, list(int) ).
 :- mode runQuery( in,        in,    out       ) is semidet.
@@ -36,38 +44,31 @@
 :- implementation.
 :- import_module set.
 
-:- pred findable( query, bool ).
-:- mode findable( in, out ) is det.
-findable( qFind(_)  , yes ).
-findable( qCond(_)  , no ).
-findable( qAnd( Qs ), Res ) :-
+findable( qqFind(_)  , yes ).
+findable( qqCond(_)  , no ).
+findable( qqAnd( Qs ), Res ) :-
   list.map( findable, Qs, Findables )
-  , Res = bool.and_list( Findables ).
-
-:- pred findable( query ).
-:- mode findable( in ) is semidet.
+  , Res = bool.or_list( Findables ).
 findable( In ) :-
   findable( In, yes ).
 
-:- pred passesAllChecks( list(qCond), int ).
-:- mode passesAllChecks( in,          in  ) is semidet.
 passesAllChecks( Qs, Elt ) :-
   list.all_true( (pred( Q :: in ) is semidet :- checkQCond( Q, Elt ) )
                , Qs ).
 
-runQuery( Space, qFind( QF ), Res ) :-
+runQuery( Space, qqFind( QF ), Res ) :-
   runQFind( Space, QF, Res ).
-runQuery( Space, qAnd( Qs ), Checkeds ) :-
+runQuery( Space, qqAnd( Qs ), Checkeds ) :-
   list.filter( findable, Qs, QQFs, QQCs )
   , list.map( runQuery( Space ), QQFs, FoundLists )
   , list.condense( FoundLists, Founds )
-  , list.map( ( pred( qCond( QC ) :: in, QC :: out ) is semidet )
+  , list.map( ( pred( qqCond( QC ) :: in, QC :: out ) is semidet )
             , QQCs, QCs )
   , list.filter( passesAllChecks( QCs )
                , Founds
                , Checkeds ).
 
-inQuery( Space, qFind( QF ), Elt ) :-
+inQuery( Space, qqFind( QF ), Elt ) :-
   inQFind( Space, QF, Elt ).
 
 runQFind( Space, qElt( Elt ),  Res          ) :-
@@ -79,6 +80,6 @@ inQFind( Space, Q,  Elt ) :-
   runQFind( Space, Q, Elts )
   , list.member( Elt, Elts ).
 
-checkQCond(    qCond(Q), Elt, Q(Elt) ).
-checkQCond(    qCond(Q), Elt ) :-
-  checkQCond(  qCond(Q), Elt, Q(Elt) ).
+checkQCond(    qCond(C), Elt, C(Elt) ).
+checkQCond(    qCond(C), Elt ) :-
+  checkQCond(  qCond(C), Elt, C(Elt) ).

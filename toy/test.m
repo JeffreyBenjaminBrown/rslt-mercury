@@ -19,6 +19,7 @@
 :- func testQElt = bool.
 :- func testQFind = bool.
 :- func testQCond = bool.
+:- func testQAnd = list(int).
 
 fiveNumberSpace = [1,2,3,4,5].
 
@@ -42,10 +43,21 @@ testQCond = Res :-
   QC = qCond( func( Int ) = (if Int > 3 then yes else no) )
   , checkQCond( QC, 5, Res5 )
   , checkQCond( QC, 3, Res3 )
-  , checkQCond( QC, 3, Res0 )
+  , checkQCond( QC, 0, Res0 )
   , Res = (if [Res5, Res3, Res0] = [yes,no,no] then yes else no).
+
+testQAnd = Res :-
+  Qs = [ qqFind( qFind( list.filter( <(2) ) ) )
+%       , qqCond( qCond( func( Int ) = (if Int > 4 then no else yes) ) )
+       ]
+  , solutions( pred( F :: out ) is nondet :-
+                 inQuery( fiveNumberSpace, qqAnd( Qs ), F )
+             , Res ).
+%  , Res = ( if set.from_list( Found ) = set.from_list( [3,4] )
+%            then yes else no ).
 
 main(!IO) :-
    io.write_string( "testQElt: "  ++ string(testQElt)  ++ "\n", !IO),
    io.write_string( "testQFind: " ++ string(testQFind) ++ "\n", !IO),
-   io.write_string( "testQCond: " ++ string(testQCond) ++ "\n", !IO).
+   io.write_string( "testQCond: " ++ string(testQCond) ++ "\n", !IO),
+   io.write_string( "testQAnd: "  ++ string(testQAnd)  ++ "\n", !IO).
