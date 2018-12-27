@@ -9,7 +9,7 @@
 
 :- type qCond ---> qCond( func( int ) = bool).
 
-:- type query ---> qFind( qFind ).
+:- type query ---> qFind( qFind ). % TODO next
 %                ; qCond( qCond ).
 %                ; qAnd( list(query) )
 %                ; qOr( list(query) )
@@ -21,12 +21,16 @@
 :- pred checkQCond( qCond, int, bool ).
 :- mode checkQCond( in,     in,  out ) is det.
 
+%:- pred runQuery( list(int), query, list(int) ).
+%:- mode runQuery( in,        in,    out       ) is det.
+
 
 :- implementation.
 
+runQFind( Space, qElt( Elt ),  Res          ) :-
+  Res = ( if list.member( Elt, Space )
+          then [Elt] else [] ).
+runQFind( Space, qFind( Gen ), Gen( Space ) ).
+
 checkQCond( qCond(Q) , Elt, Q(Elt) ).
 
-runQFind( List, qElt( Elt ), Res    ) :-
-  Res = ( if list.member( Elt, List )
-          then [Elt] else [] ).
-runQFind( List, qFind( Gen ), Gen( List ) ).
