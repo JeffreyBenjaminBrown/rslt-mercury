@@ -23,9 +23,12 @@
 
 :- pred checkQCond( qCond, int, bool ).
 :- mode checkQCond( in,     in,  out ) is det.
+:- pred checkQCond( qCond, int ).
+:- mode checkQCond( in,     in       ) is semidet.
 
 
 :- implementation.
+:- import_module set.
 
 :- pred findable( query, bool ).
 :- mode findable( in, out ) is det.
@@ -39,15 +42,27 @@ findable( qAnd( Qs ), Res ) :-
 :- mode findable( in ) is semidet.
 findable( In ) :-
   findable( In, yes ).
-% Use that for this: list.filter( findable, Qs, QFs, QNs ).
+
+% passesAllChecks( Qs, Elt ) :-
+  
 
 runQuery( Space, qFind( QF ), Res ) :-
   runQFind( Space, QF, Res ).
+runQuery( Space, qAnd( Qs ), Res ) :-
+  list.filter( findable, Qs, QFs, QNs )
+  , list.map( runQuery( Space ), QFs, FoundLists )
+  , list.condense( FoundLists, Founds )
+%  , list.map( _(some kind of lambda for "passes all the QNs")
+%            , Founds
+%            , Checkeds )
+%  , set.list_to_set( Checkeds, CheckedSets )
+  , Res = [].
 
 runQFind( Space, qElt( Elt ),  Res          ) :-
   Res = ( if list.member( Elt, Space )
           then [Elt] else [] ).
 runQFind( Space, qFind( Gen ), Gen( Space ) ).
 
-checkQCond( qCond(Q) , Elt, Q(Elt) ).
-
+checkQCond(    qCond(Q), Elt, Q(Elt) ).
+checkQCond(    qCond(Q), Elt ) :-
+  checkQCond(  qCond(Q), Elt, Q(Elt) ).
