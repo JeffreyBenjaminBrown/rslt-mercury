@@ -20,8 +20,13 @@
 :- pred findable( query ).
 :- mode findable( in ) is semidet.
 
-:- pred passesAllChecks( list(qCond), int ).
-:- mode passesAllChecks( in,          in  ) is semidet.
+:- pred allChecks( list(qCond), int, list(bool) ).
+:- mode allChecks( in,          in,  out        ) is det.
+
+:- pred passesAllChecks( list(qCond), int       ).
+:- mode passesAllChecks( in,          in        ) is semidet.
+:- pred passesAllChecks( list(qCond), int, bool ) is det.
+:- mode passesAllChecks( in,          in,  out  ) is det.
 
 :- pred runQuery( list(int), query, list(int) ).
 :- mode runQuery( in,        in,    out       ) is semidet.
@@ -52,9 +57,18 @@ findable( qqAnd( Qs ), Res ) :-
 findable( In ) :-
   findable( In, yes ).
 
+allChecks( Cs, Elt, Results ) :-
+  list.map( pred( Q :: in, Bool :: out ) is det :-
+              checkQCond( Q, Elt, Bool )
+          , Cs, Results ).
+
+passesAllChecks( Cs, Elt, Res ) :-
+  allChecks( Cs, Elt, AllChecks )
+  , Res = ( if list.all_true( pred( Bool :: in ) is semidet :- Bool = yes
+                            , AllChecks )
+            then yes else no ).
 passesAllChecks( Qs, Elt ) :-
-  list.all_true( (pred( Q :: in ) is semidet :- checkQCond( Q, Elt ) )
-               , Qs ).
+  passesAllChecks( Qs, Elt, yes ).
 
 runQuery( Space, qqFind( QF ), Res ) :-
   runQFind( Space, QF, Res ).

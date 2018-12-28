@@ -1,6 +1,30 @@
 * test findable, passesAllChecks
 * test new alternate modes
 * test qAnd (paused)
+* why doesn't this alternate definition of passesAllChecks work?
+** in query.m
+:- pred passesAllChecks2( list(qCond), int       ).
+:- mode passesAllChecks2( in,          in        ) is semidet.
+:- pred passesAllChecks2( list(qCond), int, bool ) is det.
+:- mode passesAllChecks2( in,          in,  out  ) is det.
+
+passesAllChecks2( Qs, Elt ) :-
+  list.all_true( (pred( Q :: in ) is semidet :- checkQCond( Q, Elt ) )
+               , Qs ).
+passesAllChecks2( Qs, Elt, Res ) :-
+  Res = (if passesAllChecks2( Qs, Elt ) then yes else no).
+** in test.m
+:- func testPassesAllChecks2 = list(bool).
+testPassesAllChecks2 = [T1, T3, T5] :-
+    Checks = [ qCond( func( Int ) = (if Int > 2 then yes else no) )
+             , qCond( func( Int ) = (if Int < 4 then yes else no) ) ]
+  , passesAllChecks2( Checks, 1, T1 )
+  , passesAllChecks2( Checks, 3, T3 )
+  , passesAllChecks2( Checks, 5, T5 ).
+
+test.main ...
+  , io.write_string( "testPassesAllChecks2: "
+      ++ string(testPassesAllChecks2) ++ "\n", !IO)
 * use sets
 * QNot 
 ** 1st iteration

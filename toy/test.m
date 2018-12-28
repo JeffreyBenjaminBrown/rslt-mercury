@@ -21,6 +21,8 @@
 :- func eq( X, X) = bool.
 
 :- func testFindable = bool.
+:- func testAllChecks = list(list(bool)).
+:- func testPassesAllChecks = list(bool).
 :- func testQElt = bool.
 :- func testQFind = bool.
 :- func testQCond = bool.
@@ -46,6 +48,20 @@ testFindable = Res :-
                          , eq( T3, yes )
                          , eq( T4, no )
                          , eq( T5, yes ) ] ).
+
+testAllChecks = [T1, T3, T5] :-
+    Checks = [ qCond( func( Int ) = (if Int > 2 then yes else no) )
+             , qCond( func( Int ) = (if Int < 4 then yes else no) ) ]
+  , allChecks( Checks, 1, T1 )
+  , allChecks( Checks, 3, T3 )
+  , allChecks( Checks, 5, T5 ).
+
+testPassesAllChecks = [T1, T3, T5] :-
+    Checks = [ qCond( func( Int ) = (if Int > 2 then yes else no) )
+             , qCond( func( Int ) = (if Int < 4 then yes else no) ) ]
+  , passesAllChecks( Checks, 1, T1 )
+  , passesAllChecks( Checks, 3, T3 )
+  , passesAllChecks( Checks, 5, T5 ).
 
 testQElt = Res :-
   runQFind( fiveNumberSpace
@@ -81,8 +97,12 @@ testQAnd = Res :-
 %            then yes else no ).
 
 main(!IO) :-
-   io.write_string( "testFindable: " ++ string(testFindable) ++ "\n", !IO),
-   io.write_string( "testQElt: "     ++ string(testQElt)     ++ "\n", !IO),
-   io.write_string( "testQFind: "    ++ string(testQFind)    ++ "\n", !IO),
-   io.write_string( "testQCond: "    ++ string(testQCond)    ++ "\n", !IO),
-   io.write_string( "testQAnd: "     ++ string(testQAnd)     ++ "\n", !IO).
+  io.write_string( "testFindable: "    ++ string(testFindable)  ++ "\n", !IO)
+  , io.write_string( "testAllChecks: " ++ string(testAllChecks) ++ "\n", !IO)
+  , io.write_string( "testPassesAllChecks: "
+      ++ string(testPassesAllChecks) ++ "\n", !IO)
+  , io.write_string( "testQElt: "     ++ string(testQElt)     ++ "\n", !IO)
+  , io.write_string( "testQFind: "    ++ string(testQFind)    ++ "\n", !IO)
+  , io.write_string( "testQCond: "    ++ string(testQCond)    ++ "\n", !IO)
+  , io.write_string( "testQAnd: "     ++ string(testQAnd)     ++ "\n", !IO)
+  .
