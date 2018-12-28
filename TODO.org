@@ -1,6 +1,6 @@
-* test findable, passesAllChecks
-* test new alternate modes
 * test qAnd (paused)
+* ? test new alternate modes
+If the test works one way, and the other mode signatures compile, doesn't it work?
 * why doesn't this alternate definition of passesAllChecks work?
 ** in query.m
 :- pred passesAllChecks2( list(qCond), int       ).

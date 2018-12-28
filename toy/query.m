@@ -75,7 +75,7 @@ runQuery( Space, qqFind( QF ), Res ) :-
 runQuery( Space, qqAnd( Qs ), Checkeds ) :-
   list.filter( findable, Qs, QQFs, QQCs )
   , list.map( runQuery( Space ), QQFs, FoundLists )
-  , list.condense( FoundLists, Founds )
+  , list.condense( FoundLists, Founds ) % todo ? unique
   , list.map( ( pred( qqCond( QC ) :: in, QC :: out ) is semidet )
             , QQCs, QCs )
   , list.filter( passesAllChecks( QCs )
