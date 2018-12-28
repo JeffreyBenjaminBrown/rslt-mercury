@@ -78,12 +78,11 @@ runQuery( Space, qqAnd( Qs ), Checkeds ) :-
   , list.condense( FoundLists, Founds ) % todo ? unique
   , list.map( ( pred( qqCond( QC ) :: in, QC :: out ) is semidet )
             , QQCs, QCs )
-  , list.filter( passesAllChecks( QCs )
-               , Founds
-               , Checkeds ).
+  , list.filter( passesAllChecks(QCs), Founds, Checkeds ).
 
-inQuery( Space, qqFind( QF ), Elt ) :-
-  inQFind( Space, QF, Elt ).
+inQuery( Space, Q, Elt ) :-
+  runQuery( Space, Q, Found )
+  , list.member( Elt, Found ).
 
 runQFind( Space, qElt( Elt ),  Res          ) :-
   Res = ( if list.member( Elt, Space )

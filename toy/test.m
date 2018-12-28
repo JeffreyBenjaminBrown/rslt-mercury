@@ -26,7 +26,7 @@
 :- func testQElt = list(bool).
 :- func testQFind = list(bool).
 :- func testQCond = list(bool).
-:- func testQAnd = list(int).
+:- func testQAnd = list(bool).
 
 fiveNumberSpace = [1,2,3,4,5].
 
@@ -36,7 +36,7 @@ eq( X, Y ) = Bool :-
   eq( X, Y, Bool ).
 
 testFindable = [T1, not(T2), T3, not(T4), T5] :-
-  QF = qqFind( qFind( list.filter( <(2) ) ) )
+    QF = qqFind( qFind( list.filter( <(2) ) ) )
   , QC = qqCond( qCond( func( Int ) = (if Int > 4 then no else yes) ) )
   , findable( QF, T1 )
   , findable( QC, T2 )
@@ -69,7 +69,7 @@ testQElt = Res :-
           , eq( Find7, [] ) ].
 
 testQFind = Res :-
-  runQFind( fiveNumberSpace, qFind( list.filter( <(3) ) ), Sol3 )
+    runQFind( fiveNumberSpace, qFind( list.filter( <(3) ) ), Sol3 )
   , runQFind( fiveNumberSpace, qFind( list.filter( <(9) ) ), Sol9 )
   , Res = [ eq( Sol3, [4,5] )
           , eq( Sol9, [] ) ].
@@ -81,16 +81,25 @@ testQCond = [ Res5, not(Res3), not(Res0) ] :-
   , checkQCond( QC, 0, Res0 ).
 
 testQAnd = Res :-
-  Qs = [ qqFind( qFind( list.filter( <(2) ) ) )
-%       , qqCond( qCond( func( Int ) = (if Int > 4 then no else yes) ) )
-       ]
+    QQF = qqFind( qFind( list.filter( <(3) ) ) )
+  , QQC = qqCond( qCond( func( Int )
+                         = (if Int > 4 then no else yes) ) )
+  % TODO ? How can I factor a single two-parameter pred
+  % (of the form pred( Q :: in, F :: out )) out of the multiple preds below?
   , solutions( pred( F :: out ) is nondet :-
-                 inQuery( fiveNumberSpace, qqAnd( Qs ), F )
-             , Res ).
-%  , Res = ( if set.from_list( Found ) = set.from_list( [3,4] )
-%            then yes else no ).
+               inQuery( fiveNumberSpace, qqAnd( [QQF     ] ), F )
+             , F1 )
+  , solutions( pred( F :: out ) is nondet :-
+               inQuery( fiveNumberSpace, qqAnd( [QQF, QQC] ), F )
+             , F2 )
+  , solutions( pred( F :: out ) is nondet :-
+               inQuery( fiveNumberSpace, qqAnd( [     QQC] ), F )
+             , F3 )
+  , Res = [ eq( F1, [4,5] )
+          , eq( F2, [4]   )
+          , eq( F3, []    ) ].
 
-:- func showBool( bool ) = string. % TODO ? Why do I need this.
+:- func showBool( bool ) = string. % TODO ? Why do I need this?
 showBool( B ) = string(B).
 
 :- pred test(string::in, list(bool)::in, io::di, io::uo) is det.
@@ -105,6 +114,5 @@ main(!IO) :-
   , test( "testQElt", testQElt, !IO)
   , test( "testQFind", testQFind, !IO)
   , test( "testQCond", testQCond, !IO)
-  , io.write_string( "next: not working!\n", !IO )
-  , io.write_string( "testQAnd: "     ++ string(testQAnd)     ++ "\n", !IO)
+  , test( "testQAnd", testQAnd, !IO)
   .
