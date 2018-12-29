@@ -27,6 +27,7 @@
 :- func testQFind = list(bool).
 :- func testQCond = list(bool).
 :- func testQAnd = list(bool).
+:- func testQOr  = list(bool).
 
 fiveSpace = [1,2,3,4,5].
 
@@ -111,6 +112,29 @@ testQAnd = Res :-
           , eq( F6,           [1,2,  4  ] )
           , eq( F7,           [  2,  4  ] ) ].
 
+testQOr = Res :-
+    QQFgt1 = qqFind( qFind( list.filter( <(1) ) ) )
+  , QQFlt5 = qqFind( qFind( list.filter( >(5) ) ) )
+  , QQC = qqCond( qCond( func( Int )
+                         = (if Int = 3 then no else yes) ) )
+
+  , solutions( inQueryOverFiveSpace( qqOr( [QQFgt1             ] ) ) , F1 )
+  , solutions( inQueryOverFiveSpace( qqOr( [        QQFlt5     ] ) ) , F2 )
+  , solutions( inQueryOverFiveSpace( qqOr( [                QQC] ) ) , F3 )
+  , solutions( inQueryOverFiveSpace( qqOr( [QQFgt1, QQFlt5     ] ) ) , F4 )
+  , solutions( inQueryOverFiveSpace( qqOr( [QQFgt1        , QQC] ) ) , F5 )
+  , solutions( inQueryOverFiveSpace( qqOr( [        QQFlt5, QQC] ) ) , F6 )
+  , solutions( inQueryOverFiveSpace( qqOr( [QQFgt1, QQFlt5, QQC] ) ) , F7 )
+
+  , Res = [ eq( F1,           [  2,3,4,5] )
+          , eq( F2,           [1,2,3,4  ] )
+          , eq( F3,           [         ] )
+          , eq( F4,           [1,2,3,4,5] )
+          , eq( F5,           [         ] )
+          , eq( F6,           [         ] )
+          , eq( F7,           [         ] ) ].
+
+
 :- pred test(string::in, list(bool)::in, io::di, io::uo) is det.
 test( Name, Results, !IO ) :-
   io.write_string( Name ++ ": " ++
@@ -124,4 +148,5 @@ main(!IO) :-
   , test( "testQFind", testQFind, !IO)
   , test( "testQCond", testQCond, !IO)
   , test( "testQAnd", testQAnd, !IO)
+  , test( "testQOr", testQOr , !IO)
   .

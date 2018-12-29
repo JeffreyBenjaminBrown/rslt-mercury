@@ -11,8 +11,8 @@
 
 :- type query ---> qqFind( qFind )
                  ; qqCond( qCond )
-                 ; qqAnd( list(query) ).
-%                 ; qqOr( list(query) ).
+                 ; qqAnd( list(query) )
+                 ; qqOr( list(query) ).
 %                ; qqVar( string ).
 
 :- pred findable( query, bool ).
@@ -54,6 +54,9 @@ findable( qqCond(_)  , no ).
 findable( qqAnd( Qs ), Res ) :-
   list.map( findable, Qs, Findables )
   , Res = bool.or_list( Findables ).
+findable( qqOr( Qs ),  Res ) :-
+  list.map( findable, Qs, Findables )
+  , Res = bool.and_list( Findables ).
 findable( In ) :-
   findable( In, yes ).
 
@@ -80,7 +83,12 @@ runQuery( Space, qqAnd( Qs ), Checkeds ) :-
   , list.map( ( pred( qqCond( QC ) :: in, QC :: out ) is semidet )
             , QQCs, QCs )
   , list.filter( passesAllChecks(QCs), Founds, Checkeds ).
-
+runQuery( Space, qqOr( Qs ), Founds ) :-
+    findable( qqOr( Qs ) )
+  , list.filter( findable, Qs, QQFs, QQCs )
+  , list.map( runQuery( Space ), QQFs, FoundLists )
+  , list.map( set.list_to_set, FoundLists, FoundSets )
+  , Founds = set.to_sorted_list( set.union_list( FoundSets ) ).
 inQuery( Space, Q, Elt ) :-
   runQuery( Space, Q, Found )
   , list.member( Elt, Found ).
