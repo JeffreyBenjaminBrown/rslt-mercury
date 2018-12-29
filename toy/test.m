@@ -98,14 +98,11 @@ testQAnd = Res :-
   , Res = [ eq( F1, [4,5] )
           , eq( F2, [4]   )
           , eq( F3, []    ) ].
-
-:- func showBool( bool ) = string. % TODO ? Why do I need this?
-showBool( B ) = string(B).
-
+ 
 :- pred test(string::in, list(bool)::in, io::di, io::uo) is det.
 test( Name, Results, !IO ) :-
   io.write_string( Name ++ ": " ++
-    showBool( bool.and_list( Results ) ) ++ "\n", !IO).
+    string( bool.and_list( Results ) `with_type` bool ) ++ "\n", !IO).
 
 main(!IO) :-
     test( "testFindable", testFindable, !IO)
