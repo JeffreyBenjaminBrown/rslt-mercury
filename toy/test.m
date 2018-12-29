@@ -86,21 +86,30 @@ inQueryOverFiveSpace( Q, F ) :-
   inQuery( fiveSpace, Q, F ).
 
 testQAnd = Res :-
-    QQF = qqFind( qFind( list.filter( <(3) ) ) )
+    QQFgt1 = qqFind( qFind( list.filter( <(1) ) ) )
+  , QQFlt5 = qqFind( qFind( list.filter( >(5) ) ) )
   , QQC = qqCond( qCond( func( Int )
-                         = (if Int > 4 then no else yes) ) )
+                         = (if Int = 3 then no else yes) ) )
   , InQueryOverFiveSpace = ( pred( Q :: in, F :: out ) is nondet :-
-               inQuery( fiveSpace, Q, F ) )
+                             inQuery( fiveSpace, Q, F ) )
 
   % TODO Why can't I use InQueryOverFiveSpace
   % instead of inQueryOverFiveSpace for these?
-  , solutions( inQueryOverFiveSpace( qqAnd( [QQF     ] ) ) , F1 )
-  , solutions( inQueryOverFiveSpace( qqAnd( [QQF, QQC] ) ) , F2 )
-  , solutions( inQueryOverFiveSpace( qqAnd( [     QQC] ) ) , F3 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [QQFgt1             ] ) ) , F1 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [        QQFlt5     ] ) ) , F2 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [                QQC] ) ) , F3 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [QQFgt1, QQFlt5     ] ) ) , F4 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [QQFgt1        , QQC] ) ) , F5 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [        QQFlt5, QQC] ) ) , F6 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [QQFgt1, QQFlt5, QQC] ) ) , F7 )
 
-  , Res = [ eq( F1,           [4,     5] )
-          , eq( F2,           [4       ] )
-          , eq( F3,           [        ] ) ].
+  , Res = [ eq( F1,           [  2,3,4,5] )
+          , eq( F2,           [1,2,3,4  ] )
+          , eq( F3,           [         ] )
+          , eq( F4,           [  2,3,4  ] )
+          , eq( F5,           [  2,  4,5] )
+          , eq( F6,           [1,2,  4  ] )
+          , eq( F7,           [  2,  4  ] ) ].
 
 :- pred test(string::in, list(bool)::in, io::di, io::uo) is det.
 test( Name, Results, !IO ) :-
