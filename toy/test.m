@@ -15,7 +15,7 @@
 :- import_module set.
 :- import_module string.
 
-:- func fiveNumberSpace = list(int).
+:- func fiveSpace = list(int).
 :- pred eq( X, X, bool ).
 :- mode eq( in, in, out ) is det.
 :- func eq( X, X) = bool.
@@ -28,7 +28,7 @@
 :- func testQCond = list(bool).
 :- func testQAnd = list(bool).
 
-fiveNumberSpace = [1,2,3,4,5].
+fiveSpace = [1,2,3,4,5].
 
 eq( X, Y, Bool ) :-
   Bool = (if X=Y then yes else no).
@@ -63,14 +63,14 @@ testPassesAllChecks = [ not(T1), T3, not(T5), E7] :-
   , passesAllChecks( [],     7, E7 ).
 
 testQElt = Res :-
-    runQFind( fiveNumberSpace, qElt(3), Find3 )
-  , runQFind( fiveNumberSpace, qElt(7), Find7 )
+    runQFind( fiveSpace, qElt(3), Find3 )
+  , runQFind( fiveSpace, qElt(7), Find7 )
   , Res = [ eq( Find3, [3] )
           , eq( Find7, [] ) ].
 
 testQFind = Res :-
-    runQFind( fiveNumberSpace, qFind( list.filter( <(3) ) ), Sol3 )
-  , runQFind( fiveNumberSpace, qFind( list.filter( <(9) ) ), Sol9 )
+    runQFind( fiveSpace, qFind( list.filter( <(3) ) ), Sol3 )
+  , runQFind( fiveSpace, qFind( list.filter( <(9) ) ), Sol9 )
   , Res = [ eq( Sol3, [4,5] )
           , eq( Sol9, [] ) ].
 
@@ -80,22 +80,23 @@ testQCond = [ Res5, not(Res3), not(Res0) ] :-
   , checkQCond( QC, 3, Res3 )
   , checkQCond( QC, 0, Res0 ).
 
-:- pred helper( query, int ).
-:- mode helper( in, out ) is nondet.
-helper( Q, F ) :-
-  inQuery( fiveNumberSpace, Q, F ).
+:- pred inQueryOverFiveSpace( query, int ).
+:- mode inQueryOverFiveSpace( in, out ) is nondet.
+inQueryOverFiveSpace( Q, F ) :-
+  inQuery( fiveSpace, Q, F ).
 
 testQAnd = Res :-
     QQF = qqFind( qFind( list.filter( <(3) ) ) )
   , QQC = qqCond( qCond( func( Int )
                          = (if Int > 4 then no else yes) ) )
-  , Helper = ( pred( Q :: in, F :: out ) is nondet :-
-               inQuery( fiveNumberSpace, Q, F ) )
+  , InQueryOverFiveSpace = ( pred( Q :: in, F :: out ) is nondet :-
+               inQuery( fiveSpace, Q, F ) )
 
-  % TODO Why can't I use Helper instead of helper for these?
-  , solutions( helper( qqAnd( [QQF     ] ) ) , F1 )
-  , solutions( helper( qqAnd( [QQF, QQC] ) ) , F2 )
-  , solutions( helper( qqAnd( [     QQC] ) ) , F3 )
+  % TODO Why can't I use InQueryOverFiveSpace
+  % instead of inQueryOverFiveSpace for these?
+  , solutions( inQueryOverFiveSpace( qqAnd( [QQF     ] ) ) , F1 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [QQF, QQC] ) ) , F2 )
+  , solutions( inQueryOverFiveSpace( qqAnd( [     QQC] ) ) , F3 )
 
   , Res = [ eq( F1,           [4,     5] )
           , eq( F2,           [4       ] )
