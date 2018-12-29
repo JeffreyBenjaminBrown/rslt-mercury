@@ -80,25 +80,27 @@ testQCond = [ Res5, not(Res3), not(Res0) ] :-
   , checkQCond( QC, 3, Res3 )
   , checkQCond( QC, 0, Res0 ).
 
+:- pred helper( query, int ).
+:- mode helper( in, out ) is nondet.
+helper( Q, F ) :-
+  inQuery( fiveNumberSpace, Q, F ).
+
 testQAnd = Res :-
     QQF = qqFind( qFind( list.filter( <(3) ) ) )
   , QQC = qqCond( qCond( func( Int )
                          = (if Int > 4 then no else yes) ) )
-  % TODO ? How can I factor a single two-parameter pred
-  % (of the form pred( Q :: in, F :: out )) out of the multiple preds below?
-  , solutions( pred( F :: out ) is nondet :-
-               inQuery( fiveNumberSpace, qqAnd( [QQF     ] ), F )
-             , F1 )
-  , solutions( pred( F :: out ) is nondet :-
-               inQuery( fiveNumberSpace, qqAnd( [QQF, QQC] ), F )
-             , F2 )
-  , solutions( pred( F :: out ) is nondet :-
-               inQuery( fiveNumberSpace, qqAnd( [     QQC] ), F )
-             , F3 )
-  , Res = [ eq( F1, [4,5] )
-          , eq( F2, [4]   )
-          , eq( F3, []    ) ].
- 
+  , Helper = ( pred( Q :: in, F :: out ) is nondet :-
+               inQuery( fiveNumberSpace, Q, F ) )
+
+  % TODO Why can't I use Helper instead of helper for these?
+  , solutions( helper( qqAnd( [QQF     ] ) ) , F1 )
+  , solutions( helper( qqAnd( [QQF, QQC] ) ) , F2 )
+  , solutions( helper( qqAnd( [     QQC] ) ) , F3 )
+
+  , Res = [ eq( F1,           [4,     5] )
+          , eq( F2,           [4       ] )
+          , eq( F3,           [        ] ) ].
+
 :- pred test(string::in, list(bool)::in, io::di, io::uo) is det.
 test( Name, Results, !IO ) :-
   io.write_string( Name ++ ": " ++
