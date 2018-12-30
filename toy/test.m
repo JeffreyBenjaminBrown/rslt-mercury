@@ -95,7 +95,8 @@ testQAnd = Res :-
                              inQuery( fiveSpace, Q, F ) )
 
   % TODO Why can't I use InQueryOverFiveSpace
-  % instead of inQueryOverFiveSpace for these?
+    % instead of inQueryOverFiveSpace for these?
+    % https://stackoverflow.com/questions/53972383/mercury-this-predicate-works-if-declared-at-the-top-level-but-not-as-a-lambda
   , solutions( inQueryOverFiveSpace( qqAnd( [QQFgt1             ] ) ) , F1 )
   , solutions( inQueryOverFiveSpace( qqAnd( [        QQFlt5     ] ) ) , F2 )
   , solutions( inQueryOverFiveSpace( qqAnd( [                QQC] ) ) , F3 )
