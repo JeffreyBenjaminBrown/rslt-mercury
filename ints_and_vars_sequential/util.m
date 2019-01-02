@@ -13,3 +13,9 @@ eq( X, Y, Bool ) :-
   Bool = (if X=Y then yes else no).
 eq( X, Y ) = Bool :-
   eq( X, Y, Bool ).
+
+%% How?
+%
+%:- func true((pred)) = bool.bool.
+%true(X) = Bool :-
+%  Bool = (if X then yes else no).

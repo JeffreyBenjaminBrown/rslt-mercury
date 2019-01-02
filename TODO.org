@@ -53,6 +53,12 @@ test.main ...
   , io.write_string( "testPassesAllChecks2: "
       ++ string(testPassesAllChecks2) ++ "\n", !IO)
 * use sets
+* test variants with alternate numbers of arguments
+consider this bugfix, commit number 8e1a0bdf9114bb346eeb5358363716efd9d3e67c:
+ checkQCond(    qCond(C), Elt, C(Elt) ).
+ checkQCond(    qCond(C), Elt ) :-
+-  checkQCond(  qCond(C), Elt, C(Elt) ).
++  checkQCond(  qCond(C), Elt, yes ).
 * QNot 
 ** 1st iteration
 :- type qCond ---> qNot( int ) ; ...

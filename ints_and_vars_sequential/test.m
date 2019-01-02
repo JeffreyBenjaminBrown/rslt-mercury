@@ -28,14 +28,17 @@ test( Name, Results, !IO ) :-
 
 fiveSpace = [1,2,3,4,5].
 
-testSearchable = [T1, not(T2), T3, not(T4), T5] :-
+testSearchable = [ S1, not(S2)
+                 , T1, not(T2), T3, not(T4), T5] :-
     QF = qqSearch( qSearch( func(_, IntList) = Res :-
                             list.filter( <(2), IntList, Res ) ) )
   , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes) ) )
-  , searchable( QF, T1 )
-  , searchable( QC, T2 )
-  , searchable( qqAnd( [QF] ), T3 )
-  , searchable( qqAnd( [QC] ), T4 )
+  , S1 = (if searchable( QF ) then yes else no)
+  , S2 = (if searchable( QC ) then yes else no)
+  , searchable( QF               , T1 )
+  , searchable( QC               , T2 )
+  , searchable( qqAnd( [QF] )    , T3 )
+  , searchable( qqAnd( [QC] )    , T4 )
   , searchable( qqAnd( [QC, QF] ), T5 ).
 
 % % "lambdas" for tests must be defined at the top level,
