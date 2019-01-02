@@ -45,11 +45,11 @@
 :- mode inQSearch(  in,        in,    in,      in   ) is semidet.
 :- mode inQSearch(  in,        in,    in,      out  ) is nondet.
 
-%:- pred runQuery( list(int), query, list(int) ).
-%:- mode runQuery( in,        in,    out       ) is semidet.
-%:- pred inQuery(  list(int), query, int ).
-%:- mode inQuery(  in,        in,    out       ) is nondet.
-%:- mode inQuery(  in,        in,    in        ) is semidet.
+:- pred runQuery( list(int), subst, query, list(int) ).
+:- mode runQuery( in,        in,    in,    out       ) is semidet.
+:- pred inQuery(  list(int), subst, query, int ).
+:- mode inQuery(  in,        in,    in,    out       ) is nondet.
+:- mode inQuery(  in,        in,    in,    in        ) is semidet.
 
 
 :- implementation.
@@ -90,22 +90,22 @@ inQSearch(    Space, Subst, Q,  Elt ) :-
   runQSearch( Space, Subst, Q, Elts )
   , list.member( Elt, Elts ).
 
-%runQuery( Space, qqSearch( QF ), Res ) :-
-%  runQSearch( Space, QF, Res ).
-%runQuery( Space, qqAnd( Qs ), Checkeds ) :-
-%  list.filter( searchable, Qs, QQFs, QQCs )
-%  , list.map( runQuery( Space ), QQFs, FoundLists )
-%  , list.map( set.list_to_set, FoundLists, FoundSets )
-%  , Founds = set.to_sorted_list( set.intersect_list( FoundSets ) )
-%  , list.map( ( pred( qqCond( QC ) :: in, QC :: out ) is semidet )
-%            , QQCs, QCs )
-%  , list.filter( passesAllChecks(QCs), Founds, Checkeds ).
-%runQuery( Space, qqOr( Qs ), Founds ) :-
-%    searchable( qqOr( Qs ) )
-%  , list.filter( searchable, Qs, QQFs, _ ) % TODO Use the qqConds in the _
-%  , list.map( runQuery( Space ), QQFs, FoundLists )
-%  , list.map( set.list_to_set, FoundLists, FoundSets )
-%  , Founds = set.to_sorted_list( set.union_list( FoundSets ) ).
-%inQuery( Space, Q, Elt ) :-
-%  runQuery( Space, Q, Found )
-%  , list.member( Elt, Found ).
+runQuery( Space, Subst, qqSearch( QF ), Res ) :-
+  runQSearch( Space, Subst, QF, Res ).
+runQuery( Space, Subst, qqAnd( Qs ), Checkeds ) :-
+  list.filter( searchable, Qs, QQFs, QQCs )
+  , list.map( runQuery( Space, Subst ), QQFs, FoundLists )
+  , list.map( set.list_to_set, FoundLists, FoundSets )
+  , Founds = set.to_sorted_list( set.intersect_list( FoundSets ) )
+  , list.map( pred( qqCond( QC ) :: in, QC :: out ) is semidet
+            , QQCs, QCs )
+  , list.filter( passesAllChecks( QCs, Subst ), Founds, Checkeds ).
+runQuery( Space, Subst, qqOr( Qs ), Founds ) :-
+    searchable( qqOr( Qs ) )
+  , list.filter( searchable, Qs, QQFs, _ ) % TODO Use the qqConds in the _
+  , list.map( runQuery( Space, Subst ), QQFs, FoundLists )
+  , list.map( set.list_to_set, FoundLists, FoundSets )
+  , Founds = set.to_sorted_list( set.union_list( FoundSets ) ).
+inQuery( Space, Subst, Q, Elt ) :-
+  runQuery( Space, Subst, Q, Found )
+  , list.member( Elt, Found ).
