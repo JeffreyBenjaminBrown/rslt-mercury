@@ -46,12 +46,19 @@ testSearchable = [ S1, not(S2)
 
 testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
             , Res3notEmpty, Res3NotAbsent
-            , not(Res3Not3), Res3Not4, Res3NotSet ] :-
+            , not(Res3Not3), Res3Not4, Res3NotSet
+            , not(Res3NotIn34), Res3NotIn45
+            , Res3In34, not(Res3In45) ] :-
+
     QCgt3 = qCond( func( _, Int ) = (if Int > 3 then yes else no) )
   , QCnotX = qCond( qNot( var("X") ) )
+  , QCnotInX = qCond( qNotIn( var("X") ) )
+  , QCInX = qCond( qIn( var("X") ) )
+
   , checkQCond( QCgt3,  subst( map.init ), 5, Res5gt3 )
   , checkQCond( QCgt3,  subst( map.init ), 3, Res3gt3 )
   , checkQCond( QCgt3,  subst( map.init ), 0, Res0gt3 )
+
   , checkQCond( QCnotX, subst( map.init ), 3, Res3notEmpty )
   , checkQCond( QCnotX, subst( map.singleton( var("Y"), foundElt(3) ) )
               , 3, Res3NotAbsent )
@@ -59,9 +66,23 @@ testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
               , 3, Res3Not3 )
   , checkQCond( QCnotX, subst( map.singleton( var("X"), foundElt(4) ) )
               , 3, Res3Not4 )
-  , checkQCond( QCnotX
-      , subst( map.singleton( var("X"), foundSet( set.from_list( [3,4] )) ) )
-      , 3, Res3NotSet ).
+  , checkQCond( QCnotX, subst( map.singleton( var("X")
+                             , foundSet( set.from_list( [3,4] )) ) )
+              , 3, Res3NotSet )
+
+  , checkQCond( QCnotInX, subst( map.singleton( var("X")
+                               , foundSet( set.from_list( [3,4] ) ) ) )
+              , 3, Res3NotIn34 )
+  , checkQCond( QCnotInX, subst( map.singleton( var("X")
+                               , foundSet( set.from_list( [4,5] ) ) ) )
+              , 3, Res3NotIn45 )
+
+  , checkQCond( QCInX, subst( map.singleton( var("X")
+                               , foundSet( set.from_list( [3,4] ) ) ) )
+              , 3, Res3In34 )
+  , checkQCond( QCInX, subst( map.singleton( var("X")
+                               , foundSet( set.from_list( [4,5] ) ) ) )
+              , 3, Res3In45 ).
 
 testAllChecks = Res :-
     Checks = [ qCond( func( _, Int ) = (if Int > 1 then yes else no) )
