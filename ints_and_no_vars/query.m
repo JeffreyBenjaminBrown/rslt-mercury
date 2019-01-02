@@ -62,7 +62,7 @@ findable( In ) :-
 
 checkQCond(    qCond(C), Elt, C(Elt) ).
 checkQCond(    qCond(C), Elt ) :-
-  checkQCond(  qCond(C), Elt, C(Elt) ).
+  checkQCond(  qCond(C), Elt, yes ).
 
 allChecks( Cs, Elt, Results ) :-
   list.map( pred( C :: in, Bool :: out ) is det :-
