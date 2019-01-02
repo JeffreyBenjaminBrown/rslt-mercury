@@ -39,12 +39,12 @@
 :- pred passesAllChecks( list(qCond), subst, int       ).
 :- mode passesAllChecks( in,          in,    in        ) is semidet.
 
-%:- pred runQSearch( list(int), qSearch, list(int) ).
-%:- mode runQSearch( in,        in,    out       ) is det.
-%:- pred inQSearch(  list(int), qSearch, int  ).
-%:- mode inQSearch(  in,        in,    in   ) is semidet.
-%:- mode inQSearch(  in,        in,    out  ) is nondet.
-%
+:- pred runQSearch( list(int), subst, qSearch, list(int) ).
+:- mode runQSearch( in,        in,    in,      out       ) is det.
+:- pred inQSearch(  list(int), subst, qSearch, int  ).
+:- mode inQSearch(  in,        in,    in,      in   ) is semidet.
+:- mode inQSearch(  in,        in,    in,      out  ) is nondet.
+
 %:- pred runQuery( list(int), query, list(int) ).
 %:- mode runQuery( in,        in,    out       ) is semidet.
 %:- pred inQuery(  list(int), query, int ).
@@ -82,14 +82,14 @@ passesAllChecks( Cs, Subst, Elt, Res ) :-
 passesAllChecks( Cs, Subst, Elt ) :-
   passesAllChecks( Cs, Subst, Elt, yes ).
 
-%runQSearch( Space, qElt( Elt ),  Res          ) :-
-%  Res = ( if list.member( Elt, Space )
-%          then [Elt] else [] ).
-%runQSearch( Space, qSearch( Gen ), Gen( Space ) ).
-%inQSearch( Space, Q,  Elt ) :-
-%  runQSearch( Space, Q, Elts )
-%  , list.member( Elt, Elts ).
-%
+runQSearch( Space, _, qElt( Elt ),  Res          ) :-
+  Res = ( if list.member( Elt, Space )
+          then [Elt] else [] ).
+runQSearch( Space, Subst, qSearch( Gen ), Gen( Space, Subst ) ).
+inQSearch(    Space, Subst, Q,  Elt ) :-
+  runQSearch( Space, Subst, Q, Elts )
+  , list.member( Elt, Elts ).
+
 %runQuery( Space, qqSearch( QF ), Res ) :-
 %  runQSearch( Space, QF, Res ).
 %runQuery( Space, qqAnd( Qs ), Checkeds ) :-

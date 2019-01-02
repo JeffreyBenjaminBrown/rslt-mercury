@@ -26,6 +26,8 @@
 :- func testQCond = list(bool).
 :- func testAllChecks = list(bool).
 :- func testPassesAllChecks = list(bool).
+:- func testQElt = list(bool).
+:- func testQSearch = list(bool).
 
 test( Name, Results, !IO ) :-
   io.write_string( Name ++ ": " ++
@@ -111,7 +113,7 @@ testPassesAllChecks = Res :-
              , qCond( qNot( var("X") ) )
              , qCond( qIn( var("Y") ) ) ]
   , SomeEvens = set.from_list( [0,2,4,6,8,10] )
-  , Subst = subst( map.from_assoc_list( 
+  , Subst = subst( map.from_assoc_list(
              [ ( var("X") - foundElt(4) )
              , ( var("Y") - foundSet( SomeEvens ) ) ] ) )
   , passesAllChecks( Checks, Subst,             0, T0 )
@@ -120,9 +122,34 @@ testPassesAllChecks = Res :-
   , passesAllChecks( Checks, subst( map.init ), 6, TEmpty6 )
   , Res = [ not(T0), not(T5), T6, not(TEmpty6) ].
 
+testQElt = Res :-
+    runQSearch( fiveSpace, subst( map.init ), qElt(3), Search3 )
+  , runQSearch( fiveSpace, subst( map.init ), qElt(7), Search7 )
+  , Res = [ eq( Search3, [3] )
+          , eq( Search7, [] ) ].
+
+testQSearch = Res :-
+    runQSearch( fiveSpace, subst( map.init )
+              , qSearch( func( In, _ ) = Out :-
+                         list.filter( <(3), In, Out ) )
+              , Sol3 )
+  , runQSearch( fiveSpace, subst( map.init )
+              , qSearch( func( In, _ ) = Out :-
+                         list.filter( <(9), In, Out ) )
+              , Sol9 )
+  , runQSearch( fiveSpace
+              , subst( map.singleton( var("X"), foundElt( 3 ) ) )
+              , qSearch( qFuncOfVar( func(X) = X+3, var("X") ) )
+              , SolId )
+  , Res = [ eq( Sol3, [4,5] )
+          , eq( Sol9, [] ) 
+          , eq( SolId, [6] ) ].
+
 main(!IO) :-
     test( "testSearchable", testSearchable, !IO )
   , test( "testQCond", testQCond, !IO )
   , test( "testAllChecks", testAllChecks, !IO )
   , test( "testPassesAllChecks", testPassesAllChecks, !IO )
+  , test( "testQElt", testQElt, !IO)
+  , test( "testQSearch", testQSearch, !IO )
   .

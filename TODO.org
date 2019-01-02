@@ -32,6 +32,18 @@ queries take a substitution as well as the rest of what they take
 ** pairs look like subtraction
 Pairs are written (a - b), not (a,b). Import the pair library to do that. It works even if you've also imported int.
 ** lambdas cannot be curried
+** I can't always tell when I need a lambda
+This works:
+  qSearch( qFuncOfVar( func(X) = X+1, var("X") ) )
+but this:
+  qSearch( qFuncOfVar( +(1),          var("X") ) )
+throws this error:
+  test.m:142: In clause for `testQSearch = out':
+  test.m:142:   in argument 3 of call to predicate `runQSearch'/4:
+  test.m:142:   in argument 1 of functor `qSearch/1':
+  test.m:142:   mode error: variable `V_39' has instantiatedness `free',
+  test.m:142:   expected instantiatedness for non-local variables of lambda goals
+  test.m:142:   is `ground'.
 * why doesn't this alternate definition of passesAllChecks work?
 ** in query.m
 :- pred passesAllChecks2( list(qCond), int       ).
