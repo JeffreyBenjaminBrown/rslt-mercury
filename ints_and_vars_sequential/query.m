@@ -14,12 +14,12 @@
 
 :- type qSearch ---> qElt( int )
                    ; qSearch( func( list(int), subst ) = list( int ) ).
-:- type qCond ---> qCond(     func(            subst,          int ) = bool ).
+:- type qCond ---> qCond( cond :: func(        subst,          int ) = bool
+                        , dependencies :: set( var ) ).
 :- type query ---> qqSearch( qSearch )
                  ; qqCond( qCond )
                  ; qqAnd( list(query) )
                  ; qqOr( list(query) ).
-
 
 :- pred searchable( query, bool ).
 :- mode searchable( in,    out  ) is det.
@@ -65,14 +65,14 @@ searchable( qqOr( Qs ),  Res ) :-
 searchable( In ) :-
   searchable( In, yes ).
 
-checkQCond(    qCond(C), Subst, Elt, C(Subst, Elt) ).
-checkQCond(    qCond(C), Subst, Elt ) :-
-  checkQCond(  qCond(C), Subst, Elt, yes ).
+checkQCond(    qCond(C,_), Subst, Elt, C(Subst, Elt) ).
+checkQCond(    QC,         Subst, Elt ) :-
+  checkQCond(  QC,         Subst, Elt, yes ).
 
-allChecks( Cs, Subst, Elt, Results ) :-
-  list.map( pred( C :: in, Bool :: out ) is det :-
-              checkQCond( C, Subst, Elt, Bool )
-          , Cs, Results ).
+allChecks( QCs, Subst, Elt, Results ) :-
+  list.map( pred( QC :: in, Bool :: out ) is det :-
+              checkQCond( QC, Subst, Elt, Bool )
+          , QCs, Results ).
 
 passesAllChecks( Cs, Subst, Elt, Res ) :-
   allChecks( Cs, Subst, Elt, AllChecks )
@@ -92,6 +92,7 @@ inQSearch(    Space, Subst, Q,  Elt ) :-
 
 runQuery( Space, Subst, qqSearch( QF ), Res ) :-
   runQSearch( Space, Subst, QF, Res ).
+
 runQuery( Space, Subst, qqAnd( Qs ), Checkeds ) :-
   list.filter( searchable, Qs, QQFs, QQCs )
   , list.map( runQuery( Space, Subst ), QQFs, FoundLists )
@@ -100,12 +101,14 @@ runQuery( Space, Subst, qqAnd( Qs ), Checkeds ) :-
   , list.map( pred( qqCond( QC ) :: in, QC :: out ) is semidet
             , QQCs, QCs )
   , list.filter( passesAllChecks( QCs, Subst ), Founds, Checkeds ).
+
 runQuery( Space, Subst, qqOr( Qs ), Founds ) :-
     searchable( qqOr( Qs ) )
   , list.filter( searchable, Qs, QQFs, _ ) % TODO Use the qqConds in the _
   , list.map( runQuery( Space, Subst ), QQFs, FoundLists )
   , list.map( set.list_to_set, FoundLists, FoundSets )
   , Founds = set.to_sorted_list( set.union_list( FoundSets ) ).
+
 inQuery( Space, Subst, Q, Elt ) :-
   runQuery( Space, Subst, Q, Found )
   , list.member( Elt, Found ).

@@ -39,7 +39,8 @@ testSearchable = [ S1, not(S2)
                  , T1, not(T2), T3, not(T4), T5] :-
     QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
                             list.filter( <(2), IntList, Res ) ) )
-  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes) ) )
+  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes) 
+                      , set.init ) )
   , S1 = (if searchable( QF ) then yes else no)
   , S2 = (if searchable( QC ) then yes else no)
   , searchable( QF               , T1 )
@@ -54,10 +55,10 @@ testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
             , not(Res3NotIn34), Res3NotIn45
             , Res3In34, not(Res3In45) ] :-
 
-    QCgt3 = qCond( func( _, Int ) = (if Int > 3 then yes else no) )
-  , QCnotX = qCond( qNot( var("X") ) )
-  , QCnotInX = qCond( qNotIn( var("X") ) )
-  , QCInX = qCond( qIn( var("X") ) )
+    QCgt3 = qCond( func( _, Int ) = (if Int > 3 then yes else no), set.init )
+  , QCnotX =   qCond( qNot( var("X") )  , set( [ var("X") ] ) )
+  , QCnotInX = qCond( qNotIn( var("X") ), set( [ var("X") ] ) )
+  , QCInX =    qCond( qIn( var("X") ),    set( [ var("X") ] ) )
 
   , checkQCond( QCgt3,  subst( map.init ), 5, Res5gt3 )
   , checkQCond( QCgt3,  subst( map.init ), 3, Res3gt3 )
@@ -89,9 +90,12 @@ testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
               , 3, Res3In45 ).
 
 testAllChecks = Res :-
-    Checks = [ qCond( func( _, Int ) = (if Int > 1 then yes else no) )
-             , qCond( func( _, Int ) = (if Int < 5 then yes else no) )
-             , qCond( qNot( var("X") ) ) ]
+    Checks = [ qCond( func( _, Int ) = (if Int > 1 then yes else no)
+                    , set.init )
+             , qCond( func( _, Int ) = (if Int < 5 then yes else no)
+                    , set.init )
+             , qCond( qNot( var("X") )
+                    , set( [ var("X") ] ) ) ]
   , allChecks( Checks, subst( map.init ), 1, T1 )
   , allChecks( Checks, subst( map.init ), 3, T3 )
   , allChecks( Checks, subst( map.init ), 5, T5 )
@@ -109,9 +113,12 @@ testAllChecks = Res :-
           ,      bool.and_list(T3X4 ) ].
 
 testPassesAllChecks = Res :-
-    Checks = [ qCond( func( _, Int ) = (if Int > 0 then yes else no) )
-             , qCond( qNot( var("X") ) )
-             , qCond( qIn( var("Y") ) ) ]
+    Checks = [ qCond( func( _, Int ) = (if Int > 0 then yes else no)
+                    , set.init )
+             , qCond( qNot( var("X") )
+                    , set( [ var("X") ] ) )
+             , qCond( qIn( var("Y") )
+                    , set( [ var("Y") ] ) ) ]
   , SomeEvens = set.from_list( [0,2,4,6,8,10] )
   , Subst = subst( map.from_assoc_list(
              [ ( var("X") - foundElt(4) )
