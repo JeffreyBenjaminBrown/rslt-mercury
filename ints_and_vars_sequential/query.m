@@ -26,11 +26,11 @@
 :- pred searchable( query       ).
 :- mode searchable( in          ) is semidet.
 
-%:- pred checkQCond( qCond,  int, bool ).
-%:- mode checkQCond( in,     in,  out  ) is det.
-%:- pred checkQCond( qCond,  int       ).
-%:- mode checkQCond( in,     in        ) is semidet.
-%
+:- pred checkQCond( qCond,  subst, int, bool ).
+:- mode checkQCond( in,     in,    in,  out  ) is det.
+:- pred checkQCond( qCond,  subst, int       ).
+:- mode checkQCond( in,     in,    in        ) is semidet.
+
 %:- pred allChecks( list(qCond), int, list(bool) ).
 %:- mode allChecks( in,          in,  out        ) is det.
 %
@@ -65,10 +65,10 @@ searchable( qqOr( Qs ),  Res ) :-
 searchable( In ) :-
   searchable( In, yes ).
 
-%checkQCond(    qCond(C), Elt, C(Elt) ).
-%checkQCond(    qCond(C), Elt ) :-
-%  checkQCond(  qCond(C), Elt, C(Elt) ).
-%
+checkQCond(    qCond(C), Subst, Elt, C(Subst, Elt) ).
+checkQCond(    qCond(C), Subst, Elt ) :-
+  checkQCond(  qCond(C), Subst, Elt, yes ).
+
 %allChecks( Cs, Elt, Results ) :-
 %  list.map( pred( C :: in, Bool :: out ) is det :-
 %              checkQCond( C, Elt, Bool )

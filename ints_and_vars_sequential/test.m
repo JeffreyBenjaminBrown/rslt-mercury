@@ -21,6 +21,7 @@
 :- func fiveSpace = list(int).
 
 :- func testSearchable = list(bool).
+:- func testQCond = list(bool).
 
 test( Name, Results, !IO ) :-
   io.write_string( Name ++ ": " ++
@@ -41,18 +42,35 @@ testSearchable = [ S1, not(S2)
   , searchable( qqAnd( [QC] )    , T4 )
   , searchable( qqAnd( [QC, QF] ), T5 ).
 
-% % "lambdas" for tests must be defined at the top level,
-% % because lambdas cannot be curried.
-%
-%:- pred inQueryOverFiveSpace( query, int ).
-%:- mode inQueryOverFiveSpace( in, out ) is nondet.
-%inQueryOverFiveSpace( Q, F ) :-
-%  inQuery( fiveSpace, Q, F ).
-%testQAnd = Res :-
-%    QQFgt1 = qqFind( qFind( list.filter( <(1) ) ) )
-%  , solutions( inQueryOverFiveSpace( qqAnd( [QQFgt1             ] ) ), F1 )
-%  , Res = [ eq( F1,           [  2,3,4,5] ) ].
+testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
+            , Res3notEmpty, Res3NotAbsent
+            , not(Res3Not3), Res3Not4, Res3NotSet ] :-
+  % QCgt3 ignores the Subst argument
+    QCgt3 = qCond( func( _, Int ) = (if Int > 3 then yes else no) )
+  % QCNotX checks against var('X'), if present, in the Subst
+  , QCnotX = qCond( func( subst(M), Int ) = Res :-
+                  ( if contains( M, var("X") )
+                    then Found = map.lookup( M, var("X"))
+                         , ( ( Found = foundSet(_)
+                             , Res = yes )
+                           ; ( Found = foundElt( Elt )
+                             , Res = (if Elt = Int then no else yes) ) )
+                    else Res = yes ) )
+  , checkQCond( QCgt3,  subst( map.init ), 5, Res5gt3 )
+  , checkQCond( QCgt3,  subst( map.init ), 3, Res3gt3 )
+  , checkQCond( QCgt3,  subst( map.init ), 0, Res0gt3 )
+  , checkQCond( QCnotX, subst( map.init ), 3, Res3notEmpty )
+  , checkQCond( QCnotX, subst( map.singleton( var("Y"), foundElt(3) ) )
+              , 3, Res3NotAbsent )
+  , checkQCond( QCnotX, subst( map.singleton( var("X"), foundElt(3) ) )
+              , 3, Res3Not3 )
+  , checkQCond( QCnotX, subst( map.singleton( var("X"), foundElt(4) ) )
+              , 3, Res3Not4 )
+  , checkQCond( QCnotX
+      , subst( map.singleton( var("X"), foundSet( set.from_list( [3,4] )) ) )
+      , 3, Res3NotSet ).
 
 main(!IO) :-
     test( "testSearchable", testSearchable, !IO)
+  , test( "testQCond", testQCond, !IO )
   .
