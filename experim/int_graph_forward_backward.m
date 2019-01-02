@@ -33,6 +33,6 @@ ancestor( X, Y ) :- parent( X, Middle )
 main(!IO) :-
     solutions( pred(I::out) is nondet :- ancestor(3,I), Descendents )
   , solutions( pred(I::out) is nondet :- ancestor(I,3), Ancestors )
-  , io.write_string(
-      string(Descendents) ++ "\n" ++ string(Ancestors) ++ "\n"
-    , !IO ).
+  , io.write_string(    string(Descendents) ++ "\n"
+                     ++ string(Ancestors  ) ++ "\n"
+                   , !IO ).

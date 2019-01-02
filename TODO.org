@@ -1,15 +1,33 @@
-* sequential variale assignments
-** there exists vs. for all
-Consider this "query":
-  X = 3 | 4
-  , Y = find( [1..10]
-  , Y \= X
-Does it return [1..10] or [1..10] \ [3,4]?
-** more
-  Commodities = Guns | Germs | Steel
-  , X = "#give Y #to _"
-  , "I (myself) #must X"
-  , ##not Y #in Commodities
+* TODO more types
+** the types
+program = program( list(var), list((var,query)) )
+found = foundElt int, foundSet set(int)
+subst = map var found
+queries take a substitution as well as the rest of what they take
+** idiom : sequential variale assignments
+*** need a set of substitutions, not a set of sets
+ Consider this query:
+   Commodities = Guns | Germs | Steel
+   , X = "#give Y #to _"
+   , "we #must X"
+   , ##not Y #in Commodities
+ X has an unconditional set of values, but
+ the value of Y is conditional on the value of X.
+*** there exists v. for all => sets
+**** the problem
+ Consider this "query":
+   X = 3 | 4
+   , Y = find( [1..10]
+   , Y \= X
+ Does it return [1..10] or  [1,2] ++ [5..10]?
+**** a solution: sets
+ The query as stated above should return [1..10].
+ The language should also permit the creation of sets.
+ So
+   X = solve( 3 | 4 )
+   , Y = find( [1..10]
+   , not( Y in X )
+ would return [1,2] ++ [5..10].
 * why doesn't this alternate definition of passesAllChecks work?
 ** in query.m
 :- pred passesAllChecks2( list(qCond), int       ).
