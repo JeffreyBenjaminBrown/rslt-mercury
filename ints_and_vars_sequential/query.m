@@ -31,9 +31,9 @@
 :- pred checkQCond( qCond,  subst, int       ).
 :- mode checkQCond( in,     in,    in        ) is semidet.
 
-%:- pred allChecks( list(qCond), int, list(bool) ).
-%:- mode allChecks( in,          in,  out        ) is det.
-%
+:- pred allChecks( list(qCond), subst, int, list(bool) ).
+:- mode allChecks( in,          in,    in,  out        ) is det.
+
 %:- pred passesAllChecks( list(qCond), int, bool ) is det.
 %:- mode passesAllChecks( in,          in,  out  ) is det.
 %:- pred passesAllChecks( list(qCond), int       ).
@@ -69,11 +69,11 @@ checkQCond(    qCond(C), Subst, Elt, C(Subst, Elt) ).
 checkQCond(    qCond(C), Subst, Elt ) :-
   checkQCond(  qCond(C), Subst, Elt, yes ).
 
-%allChecks( Cs, Elt, Results ) :-
-%  list.map( pred( C :: in, Bool :: out ) is det :-
-%              checkQCond( C, Elt, Bool )
-%          , Cs, Results ).
-%
+allChecks( Cs, Subst, Elt, Results ) :-
+  list.map( pred( C :: in, Bool :: out ) is det :-
+              checkQCond( C, Subst, Elt, Bool )
+          , Cs, Results ).
+
 %passesAllChecks( Cs, Elt, Res ) :-
 %  allChecks( Cs, Elt, AllChecks )
 %  , Res = ( if list.all_true( pred( Bool :: in ) is semidet :- Bool = yes
