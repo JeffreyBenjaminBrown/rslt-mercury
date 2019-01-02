@@ -28,6 +28,10 @@ queries take a substitution as well as the rest of what they take
    , Y = find( [1..10]
    , not( Y in X )
  would return [1,2] ++ [5..10].
+* TODO Gotchas
+** pairs look like subtraction
+Pairs are written (a - b), not (a,b). Import the pair library to do that. It works even if you've also imported int.
+** lambdas cannot be curried
 * why doesn't this alternate definition of passesAllChecks work?
 ** in query.m
 :- pred passesAllChecks2( list(qCond), int       ).

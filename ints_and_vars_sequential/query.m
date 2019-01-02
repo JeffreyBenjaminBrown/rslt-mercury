@@ -34,11 +34,11 @@
 :- pred allChecks( list(qCond), subst, int, list(bool) ).
 :- mode allChecks( in,          in,    in,  out        ) is det.
 
-%:- pred passesAllChecks( list(qCond), int, bool ) is det.
-%:- mode passesAllChecks( in,          in,  out  ) is det.
-%:- pred passesAllChecks( list(qCond), int       ).
-%:- mode passesAllChecks( in,          in        ) is semidet.
-%
+:- pred passesAllChecks( list(qCond), subst, int, bool ) is det.
+:- mode passesAllChecks( in,          in,    in,  out  ) is det.
+:- pred passesAllChecks( list(qCond), subst, int       ).
+:- mode passesAllChecks( in,          in,    in        ) is semidet.
+
 %:- pred runQSearch( list(int), qSearch, list(int) ).
 %:- mode runQSearch( in,        in,    out       ) is det.
 %:- pred inQSearch(  list(int), qSearch, int  ).
@@ -74,14 +74,14 @@ allChecks( Cs, Subst, Elt, Results ) :-
               checkQCond( C, Subst, Elt, Bool )
           , Cs, Results ).
 
-%passesAllChecks( Cs, Elt, Res ) :-
-%  allChecks( Cs, Elt, AllChecks )
-%  , Res = ( if list.all_true( pred( Bool :: in ) is semidet :- Bool = yes
-%                            , AllChecks )
-%            then yes else no ).
-%passesAllChecks( Qs, Elt ) :-
-%  passesAllChecks( Qs, Elt, yes ).
-%
+passesAllChecks( Cs, Subst, Elt, Res ) :-
+  allChecks( Cs, Subst, Elt, AllChecks )
+  , Res = ( if list.all_true( pred( Bool :: in ) is semidet :- Bool = yes
+                            , AllChecks )
+            then yes else no ).
+passesAllChecks( Cs, Subst, Elt ) :-
+  passesAllChecks( Cs, Subst, Elt, yes ).
+
 %runQSearch( Space, qElt( Elt ),  Res          ) :-
 %  Res = ( if list.member( Elt, Space )
 %          then [Elt] else [] ).

@@ -5,9 +5,9 @@
 :- import_module query.
 
 % TODO ? Handle mismatched conditions differently?
-% Should these (qNot, qIn, qNotIn) throw errors if ...
-  % X is not present.
-  % X is present but not the requested constructor (foundSet or foundElt).
+  % Maybe these (qNot, qIn, qNotIn) should throw errors when ...
+    % X is not present.
+    % X is present but not the requested constructor (foundSet or foundElt).
 % TODO ? test mismatches more thoroughly (in testQCond).
   % Currently mismatches are not tested for qIn and qNotIn.
 :- func qNot( var, subst, int ) = bool.

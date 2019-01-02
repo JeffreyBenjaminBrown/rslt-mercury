@@ -10,6 +10,7 @@
 :- import_module int.
 :- import_module list.
 :- import_module map.
+:- import_module pair.
 :- import_module query.
 :- import_module queries_not.
 :- import_module set.
@@ -24,6 +25,7 @@
 :- func testSearchable = list(bool).
 :- func testQCond = list(bool).
 :- func testAllChecks = list(bool).
+:- func testPassesAllChecks = list(bool).
 
 test( Name, Results, !IO ) :-
   io.write_string( Name ++ ": " ++
@@ -104,8 +106,23 @@ testAllChecks = Res :-
           ,      bool.and_list(T3Y3 )
           ,      bool.and_list(T3X4 ) ].
 
+testPassesAllChecks = Res :-
+    Checks = [ qCond( func( _, Int ) = (if Int > 0 then yes else no) )
+             , qCond( qNot( var("X") ) )
+             , qCond( qIn( var("Y") ) ) ]
+  , SomeEvens = set.from_list( [0,2,4,6,8,10] )
+  , Subst = subst( map.from_assoc_list( 
+             [ ( var("X") - foundElt(4) )
+             , ( var("Y") - foundSet( SomeEvens ) ) ] ) )
+  , passesAllChecks( Checks, Subst,             0, T0 )
+  , passesAllChecks( Checks, Subst,             5, T5 )
+  , passesAllChecks( Checks, Subst,             6, T6 )
+  , passesAllChecks( Checks, subst( map.init ), 6, TEmpty6 )
+  , Res = [ not(T0), not(T5), T6, not(TEmpty6) ].
+
 main(!IO) :-
-    test( "testSearchable", testSearchable, !IO)
+    test( "testSearchable", testSearchable, !IO )
   , test( "testQCond", testQCond, !IO )
   , test( "testAllChecks", testAllChecks, !IO )
+  , test( "testPassesAllChecks", testPassesAllChecks, !IO )
   .
