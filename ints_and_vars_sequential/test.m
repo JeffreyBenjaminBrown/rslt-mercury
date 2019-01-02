@@ -35,7 +35,7 @@ fiveSpace = [1,2,3,4,5].
 
 testSearchable = [ S1, not(S2)
                  , T1, not(T2), T3, not(T4), T5] :-
-    QF = qqSearch( qSearch( func(_, IntList) = Res :-
+    QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
                             list.filter( <(2), IntList, Res ) ) )
   , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes) ) )
   , S1 = (if searchable( QF ) then yes else no)

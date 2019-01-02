@@ -13,8 +13,8 @@
                  ; foundSet( set(int) ).
 
 :- type qSearch ---> qElt( int )
-                   ; qSearch( func( subst, list(int) ) = list(int) ).
-:- type qCond ---> qCond( func( subst, int ) = bool).
+                   ; qSearch( func( list(int), subst ) = list( int ) ).
+:- type qCond ---> qCond(     func(            subst,          int ) = bool ).
 :- type query ---> qqSearch( qSearch )
                  ; qqCond( qCond )
                  ; qqAnd( list(query) )
