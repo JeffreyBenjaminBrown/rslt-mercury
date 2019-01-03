@@ -12,7 +12,7 @@
 :- import_module map.
 :- import_module pair.
 :- import_module query.
-:- import_module queries_not.
+:- import_module query_builders.
 :- import_module set.
 :- import_module solutions.
 :- import_module string.

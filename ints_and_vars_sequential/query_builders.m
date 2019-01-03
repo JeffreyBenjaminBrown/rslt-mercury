@@ -1,4 +1,4 @@
-:- module queries_not.
+:- module query_builders.
 :- interface.
 :- import_module bool.
 :- import_module int.
