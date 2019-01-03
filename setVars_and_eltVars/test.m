@@ -16,7 +16,7 @@
 :- import_module string.
 
 :- import_module query.
-:- import_module query_builders.
+:- import_module build_queries.
 :- import_module util.
 
 
