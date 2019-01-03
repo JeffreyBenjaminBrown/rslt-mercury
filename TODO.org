@@ -1,4 +1,6 @@
-* TODO next : use qCond.dependencies
+* ? should var come with two constructors, varSet and varElt?
+* TODO next : test searchable2
+after that: use qCond.dependencies
 * TODO more types
 ** the types
 program = program( list(var), list((var,query)) )

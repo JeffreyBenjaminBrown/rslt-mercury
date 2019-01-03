@@ -63,19 +63,22 @@ allVarsInSubst( subst(Subst), Vars ) = Res :-
                        , Vars )
   , Res = bool.and_list( set.to_sorted_list( Memberships ) ).
 
-%:- pred searchable2( subst, query, bool ).
-%:- mode searchable2( in,    in,    out  ) is det.
-%:- pred searchable2( subst, query       ).
-%:- mode searchable2( in,    in          ) is semidet.
-%searchable2( Subst, qqSearch( qSearch( _, Deps ) ), Bool ) :-
-%  >>>
-%searchable2( Subst, qqCond(_)  , no ).
-%searchable2( Subst, qqAnd( Qs ), Res ) :-
-%  list.map( searchable2, Qs, Searchables )
-%  , Res = bool.or_list( Searchables ).
-%searchable2( Subst, qqOr( Qs ),  Res ) :-
-%  list.map( searchable2, Qs, Searchables )
-%  , Res = bool.and_list( Searchables ).
+:- pred searchable2( subst, query, bool ).
+:- mode searchable2( in,    in,    out  ) is semidet.
+:- pred searchable2( subst, query       ).
+:- mode searchable2( in,    in          ) is semidet.
+searchable2( Subst, qqSearch( qSearch( _, Deps ) ), Bool ) :-
+  Bool = allVarsInSubst( Subst, Deps ).
+searchable2( Subst, qqCond(   qCond( _, Deps ) ), Bool ) :-
+  Bool = allVarsInSubst( Subst, Deps ).
+searchable2( Subst, qqAnd( Qs ), Res ) :-
+  list.map( searchable2(Subst), Qs, Searchables )
+  , Res = bool.or_list( Searchables ).
+searchable2( Subst, qqOr( Qs ),  Res ) :-
+  list.map( searchable2(Subst), Qs, Searchables )
+  , Res = bool.and_list( Searchables ).
+searchable2( Subst, In ) :-
+  searchable2( Subst, In, yes ).
 
 searchable( qqSearch(_)  , yes ).
 searchable( qqCond(_)  , no ).
