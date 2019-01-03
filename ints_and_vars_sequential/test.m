@@ -35,6 +35,15 @@ test( Name, Results, !IO ) :-
 
 fiveSpace = [1,2,3,4,5].
 
+:- func testAllVarsInSubst = list(bool).
+testAllVarsInSubst = [ TEmpty, TX, TXY, not(TXZ) ] :-
+  Subst = subst( map.from_assoc_list( [ ( var("X") - foundSet( set( [3] ) ) )
+                                      , ( var("Y") - foundElt( 4) ) ] ) )
+  , TEmpty = allVarsInSubst( Subst, set.init )
+  , TX     = allVarsInSubst( Subst, set( [ var("X")           ] ) )
+  , TXY    = allVarsInSubst( Subst, set( [ var("X"), var("Y") ] ) )
+  , TXZ    = allVarsInSubst( Subst, set( [ var("X"), var("Z") ] ) ) .
+
 testSearchable = [ S1, not(S2)
                  , T1, not(T2), T3, not(T4), T5] :-
     QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
@@ -157,7 +166,8 @@ testQSearch = Res :-
           , eq( SolId, [6] ) ].
 
 main(!IO) :-
-    test( "testSearchable", testSearchable, !IO )
+    test( "testAllVarsInSubst", testAllVarsInSubst, !IO )
+  , test( "testSearchable", testSearchable, !IO )
   , test( "testQCond", testQCond, !IO )
   , test( "testAllChecks", testAllChecks, !IO )
   , test( "testPassesAllChecks", testPassesAllChecks, !IO )

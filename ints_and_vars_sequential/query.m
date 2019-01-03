@@ -22,6 +22,8 @@
                  ; qqAnd( list(query) )
                  ; qqOr( list(query) ).
 
+:- func allVarsInSubst( subst, set(var) ) = bool.
+
 :- pred searchable( query, bool ).
 :- mode searchable( in,    out  ) is det.
 :- pred searchable( query       ).
@@ -55,17 +57,23 @@
 
 :- implementation.
 
+allVarsInSubst( subst(Subst), Vars ) = Res :-
+  Memberships = set.map( func( In ) = Bool :-
+                         set.is_member( In, set( map.keys( Subst ) ), Bool )
+                       , Vars )
+  , Res = bool.and_list( set.to_sorted_list( Memberships ) ).
+
 %:- pred searchable2( subst, query, bool ).
 %:- mode searchable2( in,    in,    out  ) is det.
 %:- pred searchable2( subst, query       ).
 %:- mode searchable2( in,    in          ) is semidet.
-%
-%searchable2( qqSearch(_)  , yes ).
-%searchable2( qqCond(_)  , no ).
-%searchable2( qqAnd( Qs ), Res ) :-
+%searchable2( Subst, qqSearch( qSearch( _, Deps ) ), Bool ) :-
+%  >>>
+%searchable2( Subst, qqCond(_)  , no ).
+%searchable2( Subst, qqAnd( Qs ), Res ) :-
 %  list.map( searchable2, Qs, Searchables )
 %  , Res = bool.or_list( Searchables ).
-%searchable2( qqOr( Qs ),  Res ) :-
+%searchable2( Subst, qqOr( Qs ),  Res ) :-
 %  list.map( searchable2, Qs, Searchables )
 %  , Res = bool.and_list( Searchables ).
 
