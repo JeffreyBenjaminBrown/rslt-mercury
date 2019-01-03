@@ -1,6 +1,7 @@
-* ? should var come with two constructors, varSet and varElt?
-* TODO next : test searchable2
-after that: use qCond.dependencies
+* TODO next : qCond is never searchable
+but it is sometimes testable
+** after that, test searchable
+** after that: use dependency fields elsewhere
 * TODO more types
 ** the types
 program = program( list(var), list((var,query)) )

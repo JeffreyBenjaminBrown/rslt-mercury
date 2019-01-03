@@ -43,21 +43,22 @@ testAllKeysInMap = [TEmpty, T1, not(T2) ] :-
   , T1     = allKeysInMap( Map, set( [1,2] ) )
   , T2     = allKeysInMap( Map, set( [1,3] ) ).
 
-% :- func testSearchable = list(bool).
-%testSearchable = [ S1, not(S2)
-%                 , T1, not(T2), T3, not(T4), T5] :-
-%    QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
-%                            list.filter( <(2), IntList, Res )
-%                          , set.init, set.init ) )
-%  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes)
-%                      , set.init, set.init ) )
-%  , S1 = (if searchable( QF ) then yes else no)
-%  , S2 = (if searchable( QC ) then yes else no)
-%  , searchable( QF               , T1 )
-%  , searchable( QC               , T2 )
-%  , searchable( qqAnd( [QF] )    , T3 )
-%  , searchable( qqAnd( [QC] )    , T4 )
-%  , searchable( qqAnd( [QC, QF] ), T5 ).
+ :- func testSearchable = list(bool).
+testSearchable = [ S1, not(S2)
+                 , T1, not(T2), T3, not(T4), T5] :-
+    QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
+                            list.filter( <(2), IntList, Res )
+                          , set.init, set.init ) )
+  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes)
+                      , set.init, set.init ) )
+  , EmptySubst = subst( map.init, map.init )
+  , S1 = (if searchable( EmptySubst, QF ) then yes else no)
+  , S2 = (if searchable( EmptySubst, QC ) then yes else no)
+  , searchable( EmptySubst, QF               , T1 )
+  , searchable( EmptySubst, QC               , T2 )
+  , searchable( EmptySubst, qqAnd( [QF] )    , T3 )
+  , searchable( EmptySubst, qqAnd( [QC] )    , T4 )
+  , searchable( EmptySubst, qqAnd( [QC, QF] ), T5 ).
 
 %testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
 %            , Res3notEmpty, Res3NotAbsent
@@ -167,4 +168,6 @@ testAllKeysInMap = [TEmpty, T1, not(T2) ] :-
 
 main(!IO) :-
     test( "testAllKeysInMap", testAllKeysInMap, !IO )
+  , test( "testSearchable", testSearchable, !IO )
+  , write_string( "testSearchable " ++ string( testSearchable ) ++ "\n", !IO )
   .

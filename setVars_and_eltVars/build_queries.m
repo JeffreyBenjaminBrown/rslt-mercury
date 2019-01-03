@@ -7,9 +7,12 @@
 :- import_module query.
 
 :- func qNotElt( var, subst, int ) = bool.
-:- func qIn( var, subst, int ) = bool.
-:- func qNotIn( var, subst, int ) = bool.
-:- func qFuncOfVar( func(int) = int, var, list(int), subst ) = list(int).
+:- func qIn(     var, subst, int ) = bool.
+:- func qNotIn(  var, subst, int ) = bool.
+
+:- func qFuncOfVar( func(int) = int
+                  , var, list(int), subst )  
+  = list(int).
 
 
 :- implementation.
