@@ -13,9 +13,10 @@
                  ; foundSet( set(int) ).
 
 :- type qSearch ---> qElt( int )
-                   ; qSearch( func( list(int), subst ) = list( int ) ).
-:- type qCond ---> qCond( cond :: func(        subst,          int ) = bool
-                        , dependencies :: set( var ) ).
+           ; qSearch( search :: func( list(int), subst ) = list( int )
+                    , searchDeps :: set( var ) ).
+:- type qCond ---> qCond( cond :: func(          subst,          int ) = bool
+                    , condDeps   :: set( var ) ).
 :- type query ---> qqSearch( qSearch )
                  ; qqCond( qCond )
                  ; qqAnd( list(query) )
@@ -54,6 +55,20 @@
 
 :- implementation.
 
+%:- pred searchable2( subst, query, bool ).
+%:- mode searchable2( in,    in,    out  ) is det.
+%:- pred searchable2( subst, query       ).
+%:- mode searchable2( in,    in          ) is semidet.
+%
+%searchable2( qqSearch(_)  , yes ).
+%searchable2( qqCond(_)  , no ).
+%searchable2( qqAnd( Qs ), Res ) :-
+%  list.map( searchable2, Qs, Searchables )
+%  , Res = bool.or_list( Searchables ).
+%searchable2( qqOr( Qs ),  Res ) :-
+%  list.map( searchable2, Qs, Searchables )
+%  , Res = bool.and_list( Searchables ).
+
 searchable( qqSearch(_)  , yes ).
 searchable( qqCond(_)  , no ).
 searchable( qqAnd( Qs ), Res ) :-
@@ -85,7 +100,7 @@ passesAllChecks( Cs, Subst, Elt ) :-
 runQSearch( Space, _, qElt( Elt ),  Res          ) :-
   Res = ( if list.member( Elt, Space )
           then [Elt] else [] ).
-runQSearch( Space, Subst, qSearch( Gen ), Gen( Space, Subst ) ).
+runQSearch( Space, Subst, qSearch( Gen, _ ), Gen( Space, Subst ) ).
 inQSearch(    Space, Subst, Q,  Elt ) :-
   runQSearch( Space, Subst, Q, Elts )
   , list.member( Elt, Elts ).

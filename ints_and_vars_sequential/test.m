@@ -38,7 +38,8 @@ fiveSpace = [1,2,3,4,5].
 testSearchable = [ S1, not(S2)
                  , T1, not(T2), T3, not(T4), T5] :-
     QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
-                            list.filter( <(2), IntList, Res ) ) )
+                            list.filter( <(2), IntList, Res )
+                          , set.init ) )
   , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes) 
                       , set.init ) )
   , S1 = (if searchable( QF ) then yes else no)
@@ -138,15 +139,18 @@ testQElt = Res :-
 testQSearch = Res :-
     runQSearch( fiveSpace, subst( map.init )
               , qSearch( func( In, _ ) = Out :-
-                         list.filter( <(3), In, Out ) )
+                         list.filter( <(3), In, Out )
+                       , set.init )
               , Sol3 )
   , runQSearch( fiveSpace, subst( map.init )
               , qSearch( func( In, _ ) = Out :-
-                         list.filter( <(9), In, Out ) )
+                         list.filter( <(9), In, Out )
+                       , set.init )
               , Sol9 )
   , runQSearch( fiveSpace
               , subst( map.singleton( var("X"), foundElt( 3 ) ) )
-              , qSearch( qFuncOfVar( func(X) = X+3, var("X") ) )
+              , qSearch( qFuncOfVar( func(X) = X+3, var("X") )
+                       , set( [ var("X") ] ) )
               , SolId )
   , Res = [ eq( Sol3, [4,5] )
           , eq( Sol9, [] ) 
