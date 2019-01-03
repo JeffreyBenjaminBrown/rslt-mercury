@@ -16,6 +16,7 @@
 :- import_module string.
 
 :- import_module query.
+:- import_module query_builders.
 :- import_module util.
 
 
@@ -24,7 +25,6 @@
 
 :- func testAllKeysInMap = list(bool).
 
-%:- func testSearchable = list(bool).
 %:- func testQCond = list(bool).
 %:- func testAllChecks = list(bool).
 %:- func testPassesAllChecks = list(bool).
@@ -43,13 +43,14 @@ testAllKeysInMap = [TEmpty, T1, not(T2) ] :-
   , T1     = allKeysInMap( Map, set( [1,2] ) )
   , T2     = allKeysInMap( Map, set( [1,3] ) ).
 
+% :- func testSearchable = list(bool).
 %testSearchable = [ S1, not(S2)
 %                 , T1, not(T2), T3, not(T4), T5] :-
 %    QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
 %                            list.filter( <(2), IntList, Res )
-%                          , set.init ) )
+%                          , set.init, set.init ) )
 %  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes)
-%                      , set.init ) )
+%                      , set.init, set.init ) )
 %  , S1 = (if searchable( QF ) then yes else no)
 %  , S2 = (if searchable( QC ) then yes else no)
 %  , searchable( QF               , T1 )
@@ -57,7 +58,7 @@ testAllKeysInMap = [TEmpty, T1, not(T2) ] :-
 %  , searchable( qqAnd( [QF] )    , T3 )
 %  , searchable( qqAnd( [QC] )    , T4 )
 %  , searchable( qqAnd( [QC, QF] ), T5 ).
-%
+
 %testQCond = [ Res5gt3, not(Res3gt3), not(Res0gt3)
 %            , Res3notEmpty, Res3NotAbsent
 %            , not(Res3Not3), Res3Not4, Res3NotSet

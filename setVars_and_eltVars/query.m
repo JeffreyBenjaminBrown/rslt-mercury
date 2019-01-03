@@ -25,11 +25,11 @@
 
 :- func allKeysInMap( map(K,V), set(K) ) = bool.
 
-%:- pred searchable( query, bool ).
-%:- mode searchable( in,    out  ) is det.
-%:- pred searchable( query       ).
-%:- mode searchable( in          ) is semidet.
-%
+:- pred searchable( subst, query, bool ).
+:- mode searchable( in,    in,    out  ) is det.
+:- pred searchable( subst, query       ).
+:- mode searchable( in,    in          ) is semidet.
+
 %:- pred checkQCond( qCond,  subst, int, bool ).
 %:- mode checkQCond( in,     in,    in,  out  ) is det.
 %:- pred checkQCond( qCond,  subst, int       ).
@@ -64,35 +64,27 @@ allKeysInMap( Map, KSet ) = Res :-
                          , KSet )
   , Res = bool.and_list( set.to_sorted_list( Memberships ) ).
 
-%:- pred searchable2( subst, query, bool ).
-%:- mode searchable2( in,    in,    out  ) is semidet.
-%:- pred searchable2( subst, query       ).
-%:- mode searchable2( in,    in          ) is semidet.
-%
-%searchable2( Subst, qqSearch( qSearch( _, Deps ) ), Bool ) :-
-%  Bool = allVarsInSubst( Subst, Deps ).
-%searchable2( Subst, qqCond(   qCond( _, Deps ) ), Bool ) :-
-%  Bool = allVarsInSubst( Subst, Deps ).
-%searchable2( Subst, qqAnd( Qs ), Res ) :-
-%  list.map( searchable2(Subst), Qs, Searchables )
-%  , Res = bool.or_list( Searchables ).
-%searchable2( Subst, qqOr( Qs ),  Res ) :-
-%  list.map( searchable2(Subst), Qs, Searchables )
-%  , Res = bool.and_list( Searchables ).
-%searchable2( Subst, In ) :-
-%  searchable2( Subst, In, yes ).
-%
-%searchable( qqSearch(_)  , yes ).
-%searchable( qqCond(_)  , no ).
-%searchable( qqAnd( Qs ), Res ) :-
-%  list.map( searchable, Qs, Searchables )
-%  , Res = bool.or_list( Searchables ).
-%searchable( qqOr( Qs ),  Res ) :-
-%  list.map( searchable, Qs, Searchables )
-%  , Res = bool.and_list( Searchables ).
-%searchable( In ) :-
-%  searchable( In, yes ).
-%
+searchable( _, qqSearch( qElt(_) ), yes ).
+searchable( subst( Elts, Sets)
+          , qqSearch( qSearch( _, EltDeps, SetDeps ) )
+          , Bool ) :-
+  Bool =       allKeysInMap( Elts, EltDeps )
+         `and` allKeysInMap( Sets, SetDeps ).
+searchable( subst( Elts, Sets)
+          , qqCond(   qCond(   _, EltDeps, SetDeps ) )
+          , Bool ) :-
+  Bool =       allKeysInMap( Elts, EltDeps )
+         `and` allKeysInMap( Sets, SetDeps ).
+searchable( Subst, qqAnd( Qs ), Res ) :-
+  list.map( searchable(Subst), Qs, Searchables )
+  , Res = bool.or_list( Searchables ).
+searchable( Subst, qqOr( Qs ),  Res ) :-
+  list.map( searchable(Subst), Qs, Searchables )
+  , Res = bool.and_list( Searchables ).
+
+searchable(   Subst, In ) :-
+  searchable( Subst, In, yes ).
+
 %checkQCond(    qCond(C,_), Subst, Elt, C(Subst, Elt) ).
 %checkQCond(    QC,         Subst, Elt ) :-
 %  checkQCond(  QC,         Subst, Elt, yes ).
