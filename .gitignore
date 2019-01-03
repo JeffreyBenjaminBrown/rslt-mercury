@@ -5,6 +5,7 @@ git-comment.txt
 *.mh
 *~
 Mercury/
+later/
 
 int_graph_forward_backward
 rslt

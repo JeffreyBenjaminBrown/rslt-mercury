@@ -22,6 +22,8 @@
 :- pred test(string::in, list(bool)::in, io::di, io::uo) is det.
 :- func fiveSpace = list(int).
 
+:- func testAllKeysInMap = list(bool).
+
 %:- func testSearchable = list(bool).
 %:- func testQCond = list(bool).
 %:- func testAllChecks = list(bool).
@@ -35,21 +37,18 @@ test( Name, Results, !IO ) :-
 
 fiveSpace = [1,2,3,4,5].
 
-%:- func testAllVarsInSubst = list(bool).
-%testAllVarsInSubst = [ TEmpty, TX, TXY, not(TXZ) ] :-
-%  Subst = subst( map.from_assoc_list( [ ( var("X") - foundSet( set( [3] ) ) )
-%                                      , ( var("Y") - foundElt( 4) ) ] ) )
-%  , TEmpty = allVarsInSubst( Subst, set.init )
-%  , TX     = allVarsInSubst( Subst, set( [ var("X")           ] ) )
-%  , TXY    = allVarsInSubst( Subst, set( [ var("X"), var("Y") ] ) )
-%  , TXZ    = allVarsInSubst( Subst, set( [ var("X"), var("Z") ] ) ) .
-%
+testAllKeysInMap = [TEmpty, T1, not(T2) ] :-
+    Map = map.from_assoc_list( [ (1 - 11), (2 - 12) ] )
+  , TEmpty = allKeysInMap( Map, set.init )
+  , T1     = allKeysInMap( Map, set( [1,2] ) )
+  , T2     = allKeysInMap( Map, set( [1,3] ) ).
+
 %testSearchable = [ S1, not(S2)
 %                 , T1, not(T2), T3, not(T4), T5] :-
 %    QF = qqSearch( qSearch( func( IntList, _ ) = Res :-
 %                            list.filter( <(2), IntList, Res )
 %                          , set.init ) )
-%  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes) 
+%  , QC = qqCond( qCond( func(_, Int ) = (if Int > 4 then no else yes)
 %                      , set.init ) )
 %  , S1 = (if searchable( QF ) then yes else no)
 %  , S2 = (if searchable( QC ) then yes else no)
@@ -162,9 +161,9 @@ fiveSpace = [1,2,3,4,5].
 %                       , set( [ var("X") ] ) )
 %              , SolId )
 %  , Res = [ eq( Sol3, [4,5] )
-%          , eq( Sol9, [] ) 
+%          , eq( Sol9, [] )
 %          , eq( SolId, [6] ) ].
 
 main(!IO) :-
-    test( "empty test", [yes,yes], !IO )
+    test( "testAllKeysInMap", testAllKeysInMap, !IO )
   .

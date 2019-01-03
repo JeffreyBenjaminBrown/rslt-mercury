@@ -7,22 +7,24 @@
 :- import_module set.
 
 :- type program ---> program( list(var), list(query) ).
-:- type subst ---> subst( substElt  :: map( var, int      )
+:- type subst ---> subst( substElts :: map( var,     int  )
                         , substSets :: map( var, set(int) ) ).
-:- type var ---> varElt( string ) ; varSet( string ).
+:- type var ---> var( string ).
 
 :- type qSearch ---> qElt( int )
-           ; qSearch( search :: func( list(int), subst ) = list( int )
-                    , searchDeps :: set( var ) ).
-:- type qCond ---> qCond( cond :: func(          subst,          int ) = bool
-                    , condDeps   :: set( var ) ).
+                   ; qSearch( search :: func( list(int), subst ) = list( int )
+                       , searchEltDeps :: set( var )
+                       , searchSetDeps :: set( var ) ).
+:- type qCond ---> qCond( cond        :: func(           subst,   int ) = bool
+                        , condEltDeps :: set( var )
+                        , condSetDeps :: set( var ) ).
 :- type query ---> qqSearch( qSearch )
                  ; qqCond( qCond )
                  ; qqAnd( list(query) )
                  ; qqOr( list(query) ).
 
-%:- func allVarsInSubst( subst, set(var) ) = bool.
-%
+:- func allKeysInMap( map(K,V), set(K) ) = bool.
+
 %:- pred searchable( query, bool ).
 %:- mode searchable( in,    out  ) is det.
 %:- pred searchable( query       ).
@@ -52,17 +54,16 @@
 %:- pred inQuery(  list(int), subst, query, int ).
 %:- mode inQuery(  in,        in,    in,    out       ) is nondet.
 %:- mode inQuery(  in,        in,    in,    in        ) is semidet.
-%
-%
-%:- implementation.
-%
-%allVarsInSubst( subst( SElts, SSets ), Vars ) = Res :-
-%    list.filter( func(
-%  , Memberships = set.map( func( In ) = Bool :-
-%                         set.is_member( In, set( map.keys( Subst ) ), Bool )
-%                       , Vars )
-%  , Res = bool.and_list( set.to_sorted_list( Memberships ) ).
-%
+
+
+:- implementation.
+
+allKeysInMap( Map, KSet ) = Res :-
+    Memberships = set.map( func( In ) = Bool :-
+                           set.is_member( In, set( map.keys( Map ) ), Bool )
+                         , KSet )
+  , Res = bool.and_list( set.to_sorted_list( Memberships ) ).
+
 %:- pred searchable2( subst, query, bool ).
 %:- mode searchable2( in,    in,    out  ) is semidet.
 %:- pred searchable2( subst, query       ).
