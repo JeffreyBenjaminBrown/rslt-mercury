@@ -1,3 +1,7 @@
+* latest subproject is setVars_and_eltVars
+* TODO ? Maybe, rather than setvars and eltvars
+I should compute each var as a set of (perhaps conditional) possibilities,
+and then refer to each var in later queries as "some X" or "every X".
 * TODO next : qCond is never searchable
 but it is sometimes testable
 ** after that, test searchable

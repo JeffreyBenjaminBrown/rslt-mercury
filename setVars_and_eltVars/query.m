@@ -6,18 +6,19 @@
 :- import_module map.
 :- import_module set.
 
-:- type program ---> program( list(var), list(query) ).
+:- type program ---> program( list(int), list(var), list((var,query)) ).
 :- type subst ---> subst( substElts :: map( var,     int  )
                         , substSets :: map( var, set(int) ) ).
 :- type var ---> var( string ).
 
 :- type qSearch ---> qElt( int )
-                   ; qSearch( search :: func( list(int), subst ) = list( int )
-                       , searchEltDeps :: set( var )
-                       , searchSetDeps :: set( var ) ).
-:- type qCond ---> qCond( cond        :: func(           subst,   int ) = bool
-                        , condEltDeps :: set( var )
-                        , condSetDeps :: set( var ) ).
+  ; qSearch( search :: func( list(int), subst ) = list(int)
+     , searchEltDeps :: set( var )
+     , searchSetDeps :: set( var ) ).
+:- type qCond --->
+    qCond(   cond   :: func(            subst,         int ) = bool
+     , condEltDeps   :: set( var )
+     , condSetDeps   :: set( var ) ).
 :- type query ---> qqSearch( qSearch )
                  ; qqCond( qCond )
                  ; qqAnd( list(query) )
